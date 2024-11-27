@@ -5,4 +5,6 @@ public class BillController {
 		System.out.println("hello");
 	}
 
+	public void display1() {
+		System.out.println("display");	}
 }
