@@ -1,97 +1,177 @@
 package com.hms.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+
+
 import java.time.LocalDate;
+import java.util.List;
+
+
 
 @Entity
 public class Bill {
+	 @Id
+	
+	    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+	 @Column(name = "bill_id")
+	 private Long billId;
+	
+	 private double consultationFees;
+	 private double medicineFees;
+	 private double testCharge;
+	   
+     public Boolean getIsInsuranceApplicable() {
+		return isInsuranceApplicable;
+	}
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int billId;
+	public void setIsInsuranceApplicable(Boolean isInsuranceApplicable) {
+		this.isInsuranceApplicable = isInsuranceApplicable;
+	}
 
-    private double medicines;
-    private double testcharges;
-    private double miscellaneous;
-    private String description;
-    private boolean isInsuranceApplicable;
-    private float discountPercentage;
-    private boolean tax;
+	public LocalDate getBillDate() {
+		return billDate;
+	}
+
+	public void setBillDate(LocalDate billDate) {
+		this.billDate = billDate;
+	}
+
+	public double getTestCharge() {
+		return testCharge;
+	}
+
+	private double  miscellaneousCharge;
+     public Bill(Long billId, double consultationFees, double medicineFees, double tescharge, double miscellaneouscharge,
+			String description, Boolean isInsuranceApplicable, double insuranceClaimedAmount, float discountPercentage,
+			double taxes, LocalDate billDate, Appointment appointment, List<Payment> pmtList) {
+		super();
+		this.billId = billId;
+		this.consultationFees = consultationFees;
+		this.medicineFees = medicineFees;
+		this.testCharge = tescharge;
+		this.miscellaneousCharge = miscellaneouscharge;
+		this.description = description;
+		this.isInsuranceApplicable = isInsuranceApplicable;
+		this.insuranceClaimedAmount = insuranceClaimedAmount;
+		this.discountPercentage = discountPercentage;
+		this.taxes = taxes;
+		billDate = billDate;
+		this.appointment = appointment;
+		this.pmtList = pmtList;
+	}
+
+	private  String description;
+	@Column(name = "is_insurance_applicable")
+    private Boolean isInsuranceApplicable;
+   
+    private double insuranceClaimedAmount;
+    private float  discountPercentage;
+    private double taxes;
+    
     private LocalDate billDate;
+   
+   
+    @OneToOne
+    @JoinColumn(name = "appointment_id", nullable = false)
+    @JsonIgnoreProperties("billObj")
+    private Appointment appointment;
 
-    // Getters and Setters
-    public int getBillId() {
-        return billId;
-    }
+    @OneToMany(mappedBy = "billObj", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> pmtList;
+    
+    public Bill() {}
 
-    public void setBillId(int billId) {
-        this.billId = billId;
-    }
+	public Long getBillId() {
+		return billId;
+	}
 
-    public double getMedicines() {
-        return medicines;
-    }
+	public void setBillId(Long billId) {
+		this.billId = billId;
+	}
 
-    public void setMedicines(double medicines) {
-        this.medicines = medicines;
-    }
+	public double getConsultationFees() {
+		return consultationFees;
+	}
 
-    public double getTestcharges() {
-        return testcharges;
-    }
+	public void setConsultationFees(double consultationFees) {
+		this.consultationFees = consultationFees;
+	}
 
-    public void setTestcharges(double testcharges) {
-        this.testcharges = testcharges;
-    }
+	public double getMedicineFees() {
+		return medicineFees;
+	}
 
-    public double getMiscellaneous() {
-        return miscellaneous;
-    }
+	public void setMedicineFees(double medicineFees) {
+		this.medicineFees = medicineFees;
+	}
 
-    public void setMiscellaneous(double miscellaneous) {
-        this.miscellaneous = miscellaneous;
-    }
+	
+	public void setTestCharge(double testCharge) {
+		this.testCharge = testCharge;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public double getMiscellaneousCharge() {
+		return miscellaneousCharge;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setMiscellaneousCharge(double miscellaneouscharge) {
+		this.miscellaneousCharge = miscellaneouscharge;
+	}
 
-    public boolean isInsuranceApplicable() {
-        return isInsuranceApplicable;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setInsuranceApplicable(boolean insuranceApplicable) {
-        isInsuranceApplicable = insuranceApplicable;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public float getDiscountPercentage() {
-        return discountPercentage;
-    }
+	
+	
 
-    public void setDiscountPercentage(float discountPercentage) {
-        this.discountPercentage = discountPercentage;
-    }
+	public double getInsuranceClaimedAmount() {
+		return insuranceClaimedAmount;
+	}
 
-    public boolean isTax() {
-        return tax;
-    }
+	public void setInsuranceClaimedAmount(double insuranceClaimedAmount) {
+		this.insuranceClaimedAmount = insuranceClaimedAmount;
+	}
 
-    public void setTax(boolean tax) {
-        this.tax = tax;
-    }
+	public float getDiscountPercentage() {
+		return discountPercentage;
+	}
 
-    public LocalDate getBillDate() {
-        return billDate;
-    }
+	public void setDiscountPercentage(float discountPercentage) {
+		this.discountPercentage = discountPercentage;
+	}
 
-    public void setBillDate(LocalDate billDate) {
-        this.billDate = billDate;
-    }
+	public double getTaxes() {
+		return taxes;
+	}
+
+	public void setTaxes(double taxes) {
+		this.taxes = taxes;
+	}
+
+	
+
+	public Appointment getAppointment() {
+		return appointment;
+	}
+
+	public void setAppointment(Appointment appointment) {
+		this.appointment = appointment;
+	}
+
+	public List<Payment> getPmtList() {
+		return pmtList;
+	}
+
+	public void setPmtList(List<Payment> pmtList) {
+		this.pmtList = pmtList;
+	}
+   
 }
+    
+    
