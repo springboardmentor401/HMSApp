@@ -16,8 +16,9 @@ public class Patient {
     private String patientName;
 
     @NotBlank(message = "Contact number is required")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Contact number must be a 10-digit number")
+    @Pattern(regexp = "^[6-9][0-9]{9}$", message = "Contact number must start with 6, 7, 8, or 9 and be a 10-digit number")
     private String contactNumber;
+
 
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
@@ -25,31 +26,49 @@ public class Patient {
     @NotBlank(message = "Gender is required")
     @Pattern(regexp = "^(Male|Female|Other)$", message = "Gender must be 'Male', 'Female', or 'Other'")
     private String gender;
-
-    @Size(min = 3, max = 50, message = "Allergies description must be between 3 and 50 characters")
+    
+    @NotBlank(message = "Allergy information is required")
+    @Pattern(regexp = "^[A-Za-z,\\s-]+$", message = "Allergy information must contain only alphabetic characters, commas, spaces, and hyphens")
+    @Size(min = 4, max = 200, message = "Allergy information must be between 4 and 200 characters")
     private String allergies;
 
-    @Size(min = 3, max = 50, message = "Medications description must be between 3 and 50 characters")
+    @NotBlank(message = "Medication information is required")
+    @Pattern(regexp = "^[A-Za-z,\\s.-]+$", message = "Medication information must contain only alphabetic characters, commas, spaces, periods, and hyphens")
+    @Size(min = 4, max = 50, message = "Medication information must be between 4 and 50 characters")
     private String medications;
+
 
     @NotBlank(message = "Email ID is required")
     @Email(message = "Email ID must be valid")
     @Size(min = 3, max = 50, message = "Email ID must be between 3 and 50 characters")
     private String emailId;
 
-    @Size(min = 3, max = 50, message = "Location description must be between 3 and 50 characters")
+    @NotBlank(message = "Location is required")
+    @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Location must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
+    @Size(min = 3, max = 50, message = "Location must be between 3 and 50 characters")
     private String location;
 
-    @Size(min = 3, max = 50, message = "Treatments description must be between 3 and 50 characters")
+
+    @NotBlank(message = "Treatment is required")
+    @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Treatment must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
+    @Size(min = 3, max = 50, message = "Treatment must be between 3 and 50 characters")
     private String treatments;
 
+
+    @NotBlank(message = "Medical history is required")
+    @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Medical history must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
     @Size(min = 3, max = 50, message = "Medical history must be between 3 and 50 characters")
     private String medicalHistory;
 
+
+    @NotBlank(message = "Other information is required")
+    @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Other information must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
     @Size(min = 3, max = 50, message = "Other information must be between 3 and 50 characters")
     private String others;
 
-    private boolean status;
+    @NotNull(message = "Status is required")
+    private Boolean status;  // Wrapper class allows null value, use @NotNull if needed
+
 
     // Constructors
     public Patient() {}
