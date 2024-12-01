@@ -1,3 +1,4 @@
+
 package com.hms.service;
 
 import com.hms.entities.Patient;
@@ -16,25 +17,29 @@ public class PatientService {
 
     // Add a new patient
     public Patient addPatient(Patient patient) {
-        return patientRepository.save(patient);
+        try {
+            return patientRepository.save(patient);  // Save the patient in the database
+        } catch (Exception ex) {
+            throw new RuntimeException("Error while adding patient: " + ex.getMessage());
+        }
     }
 
-    // Get all patients
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    // View all patients
+    public List<Patient> viewAllPatients() {
+        try {
+            return patientRepository.findAll();  // Retrieve all patients from the database
+        } catch (Exception ex) {
+            throw new RuntimeException("Error while retrieving patients: " + ex.getMessage());
+        }
     }
 
     // Get a patient by ID
-    /*public Patient getPatientById(int id) {
-        return patientRepository.findById(id).orElse(null);
-    }*/
- 
     public Patient getPatientById(int id) {
-        return patientRepository.findById(id).orElse(null); // Returns null if patient is not found
-    }
-
-    // Get all patients (to solve the viewAllPatients issue)
-    public List<Patient> viewAllPatients() {
-        return patientRepository.findAll(); // Return a list of all patients
+        try {
+            Optional<Patient> patient = patientRepository.findById(id);  // Find patient by ID
+            return patient.orElse(null);  // Return patient if found, otherwise null
+        } catch (Exception ex) {
+            throw new RuntimeException("Error while retrieving patient by ID: " + ex.getMessage());
+        }
     }
 }
