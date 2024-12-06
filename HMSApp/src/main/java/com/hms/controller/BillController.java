@@ -1,17 +1,25 @@
 package com.hms.controller;
 
+import com.hms.entities.Appointment;
 import com.hms.entities.Bill;
+import com.hms.exception.InvalidEntityException;
 import com.hms.service.BillService;
 
+import jakarta.validation.Valid;
 
 import com.hms.service.AppointmentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bills")
@@ -23,9 +31,30 @@ public class BillController {
     @Autowired
     private AppointmentService appointmentService;
 
-    // Create a bill
+    
     @PostMapping("/generateBill/{appointmentId}")
-    public ResponseEntity<Bill> generateBill( @RequestBody Bill bill, @PathVariable Integer appointmentId) {
+    public ResponseEntity<Object> generateBill(@Valid @RequestBody Bill bill, BindingResult result, @PathVariable int appointmentId){
+
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError e : result.getFieldErrors()) {
+                errors.put(e.getField(), e.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        float discountPercentage = 0.0f;
+
+        // Check if medicine fees are greater than 1000 and set discount
+        if (bill.getMedicineFees() > 1000) {
+            discountPercentage = 10.0f; // 10% discount for medicine fees greater than 1000
+        }
+
+        // Set the discount percentage in the Bill object
+        bill.setDiscountPercentage(discountPercentage);
+
+       
+
         Bill generatedBill = billService.generateBill(bill, appointmentId);
         if (generatedBill != null) {
             // Return HTTP 201 (Created) status with the generated Bill as the body
@@ -35,6 +64,7 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
 
     // Get all bills
     @GetMapping("/viewAllBills")
@@ -51,7 +81,7 @@ public class BillController {
 
     // Get a specific bill by ID
     @GetMapping("/viewBill/{billId}")
-    public ResponseEntity<Bill> viewBill(@PathVariable Long billId) {
+    public ResponseEntity<Bill> viewBill(@PathVariable int billId) {
         Bill bill = billService.getBillById(billId);
         if (bill != null) {
             // Return HTTP 200 (OK) with the Bill details
@@ -64,7 +94,7 @@ public class BillController {
 
     // Update medicine fees for a bill
     @PutMapping("/updateMedicineFees/{billId}/{medicineFees}")
-    public ResponseEntity<Bill> updateMedicineFees(@PathVariable Long billId, @PathVariable double medicineFees) {
+    public ResponseEntity<Bill> updateMedicineFees(@PathVariable int billId, @PathVariable double medicineFees) {
         Bill updatedBill = billService.updateMedicineFees(billId, medicineFees);
         if (updatedBill != null) {
             // Return HTTP 200 (OK) with the updated Bill
@@ -77,7 +107,7 @@ public class BillController {
 
     // Update test charges for a bill
     @PutMapping("/updateTestCharge/{billId}/{testCharge}")
-    public ResponseEntity<Bill> updateTestCharge(@PathVariable Long billId, @PathVariable double testCharge) {
+    public ResponseEntity<Bill> updateTestCharge(@PathVariable int billId, @PathVariable double testCharge) {
         Bill updatedBill = billService.updateTestCharge(billId, testCharge);
         if (updatedBill != null) {
             // Return HTTP 200 (OK) with the updated Bill
@@ -87,4 +117,14 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-}
+    @GetMapping("/consultationFees/{appointmentId}")
+    public ResponseEntity<Double> getConsultationFees(@PathVariable int appointmentId) throws InvalidEntityException {
+    	Appointment appointment = appointmentService.getAppointmentById(appointmentId);
+        double consultationFees = appointment.getDoctorObj().getConsultationFees();
+        return ResponseEntity.ok(consultationFees);
+        
+           
+        } 
+    }
+
+
