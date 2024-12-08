@@ -18,6 +18,8 @@ public class PatientService {
     // Add a new patient
     public Patient addPatient(Patient patient) {
         try {
+            patient.setStatus("Active");
+
             return patientRepository.save(patient);  // Save the patient in the database
         } catch (Exception ex) {
             throw new RuntimeException("Error while adding patient: " + ex.getMessage());
