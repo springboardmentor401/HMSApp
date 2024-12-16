@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Home</title>
+	</head>
+	<body>
+		<h1>Patient Module</h1>
+		<a th:href="@{/addPatientForm}">Add Patient</a><br>
+		<a href="/viewAllPatients" class="btn btn-secondary">View All Patients</a><br>
+	    <a th:href="@{/viewPatientByIdForm}" class="btn btn-primary">View Patient By ID</a><br>
+		<a th:href="@{/viewPatientByNameForm}" class="btn btn-warning">View Patient By Name</a><br>
+		<a th:href="@{/updatePatientForm}" class="btn btn-warning">Go to Update Patient Form</a><br>
+		<a th:href="@{/viewPatientsByDoctorAndDateForm}" class="btn btn-info">View Patients by Doctor and Date</a><br>
+
+		<!-- New Functions -->
+		<a th:href="@{/viewPatientByMedicalHistoryForm}" class="btn btn-success">View Patients by Medical History</a><br>
+		
+
+		<div th:if="${message}">
+			<p th:text="${message}"></p>
+		</div>
+	</body>
+</html>

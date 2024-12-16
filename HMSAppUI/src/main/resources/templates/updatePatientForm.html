@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fetch Patient by ID</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Fetch Patient by ID</h2>
+
+        <form th:action="@{/updatePatient}" method="post">
+            <div class="form-group">
+                <label for="patientId">Patient ID:</label>
+                <input type="number" class="form-control" id="patientId" name="patientId" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Fetch Patient</button>
+        </form>
+
+        <div th:if="${error}" class="alert alert-danger mt-3" role="alert">
+            <p th:text="${error}"></p>
+        </div>
+
+        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
+</body>
+</html>

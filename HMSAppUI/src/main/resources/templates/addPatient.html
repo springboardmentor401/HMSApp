@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Patient</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Add Patient</h2>
+        <form th:action="@{/addPatients}" method="post" th:object="${patient}">
+            <div class="form-group">
+                <label for="patientName">Name:</label>
+                <input type="text" class="form-control" id="patientName" th:field="*{patientName}" required>
+				<div th:if="${#fields.hasErrors('patientName')}" th:errors="*{patientName}" style="color:red"></div>
+            </div>
+            <div class="form-group">
+                <label for="contactNumber">Contact Number:</label>
+                <input type="text" class="form-control" id="contactNumber" th:field="*{contactNumber}" required>
+				<div th:if="${#fields.hasErrors('contactNumber')}" th:errors="*{contactNumber}" style="color:red"></div>
+            </div>
+			<form id="updatePatientForm" action="/update-patient" method="post">
+			    <div class="form-group">
+			        <label for="dateOfBirth">Date of Birth:</label>
+			        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
+			    </div>
+			    <button type="submit" class="btn btn-primary">Update Patient</button>
+			</form>
+
+			
+			<div class="form-group">
+			    <label>Gender:</label>
+			    <div>
+			        <div class="form-check">
+			            <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" th:field="*{gender}" required>
+			            <label class="form-check-label" for="genderMale">Male</label>
+			        </div>
+			        <div class="form-check">
+			            <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female" th:field="*{gender}" required>
+			            <label class="form-check-label" for="genderFemale">Female</label>
+			        </div>
+			        <div class="form-check">
+			            <input class="form-check-input" type="radio" name="gender" id="genderOther" value="Other" th:field="*{gender}" required>
+			            <label class="form-check-label" for="genderOther">Other</label>
+			        </div>
+			    </div>
+				<div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" style="color:red"></div>
+			</div>
+			<div class="form-group">
+						     <label for="location">Location:</label>
+						     <input type="text" class="form-control" id="location" th:field="*{location}">
+							 <div th:if="${#fields.hasErrors('location')}" th:errors="*{location}" style="color:red"></div>
+						</div>
+						<div class="form-group">
+						      <label for="">EmailId:</label>
+						      <input type="text" class="form-control" id="emailId" th:field="*{emailId}">
+							  <div th:if="${#fields.hasErrors('emailId')}" th:errors="*{emailId}" style="color:red"></div>
+						</div>
+            <div class="form-group">
+                <label for="allergies">Allergies:</label>
+                <input type="text" class="form-control" id="allergies" th:field="*{allergies}">
+				<div th:if="${#fields.hasErrors('allergies')}" th:errors="*{allergies}" style="color:red"></div>
+            </div>
+            <div class="form-group">
+                <label for="medications">Medications:</label>
+                <input type="text" class="form-control" id="medications" th:field="*{medications}">
+				<div th:if="${#fields.hasErrors('medications')}" th:errors="*{medications}" style="color:red"></div>
+            </div>
+			
+            <div class="form-group">
+                <label for="treatments">Treatments:</label>
+                <input type="text" class="form-control" id="treatments" th:field="*{treatments}">
+				<div th:if="${#fields.hasErrors('treatments')}" th:errors="*{treatments}" style="color:red"></div>
+            </div>
+            <div class="form-group">
+                <label for="medicalHistory">Medical History:</label>
+                <input type="text" class="form-control" id="medicalHistory" th:field="*{medicalHistory}">
+				<div th:if="${#fields.hasErrors('medicalHistory')}" th:errors="*{medicalHistory}" style="color:red"></div>
+            </div>
+            <div class="form-group">
+                <label for="others">Others:</label>
+                <input type="text" class="form-control" id="others" th:field="*{others}">
+				<div th:if="${#fields.hasErrors('others')}" th:errors="*{others}" style="color:red"></div>
+            </div>
+
+           <!-- <h4>Appointments</h4>
+            <div th:each="appointment, iterStat : ${patient.appointmentList}">
+                <div class="form-group">
+                    <label>Appointment Date:</label>
+                    <input type="datetime-local" class="form-control" th:field="*{appointmentList[__${iterStat.index}__].appointmentDate}" required>
+                </div>
+                <div class="form-group">
+                    <label>Doctor Name:</label>
+                    <input type="text" class="form-control" th:field="*{appointmentList[__${iterStat.index}__].doctorName}" required>
+                </div>
+                <div class="form-group">
+                    <label>Reason:</label>
+                    <input type="text" class="form-control" th:field="*{appointmentList[__${iterStat.index}__].reason}" required>
+                </div>
+                <hr/>
+            </div>-->
+			<button type="submit" class="btn btn-primary">Add Patient</button>
+			<a href="/" class="btn btn-primary">Back to Home</a>
+			<div th:if="${message}">
+					        <p th:text="${message}"></p>
+				    </div>
+		</form>
+		</div>
+	</body>
+</html>
