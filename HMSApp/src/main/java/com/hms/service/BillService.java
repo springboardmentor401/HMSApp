@@ -22,7 +22,7 @@ public class BillService {
     private AppointmentRepository appRepository;
 
     // Generate a bill
-    public Bill generateBill(Bill bill, Integer appointmentId) {
+    public Bill generateBill(Bill bill, int appointmentId) {
         Optional<Appointment> op = appRepository.findById(appointmentId);
         if (op.isPresent()) {
             Appointment appointment = op.get();
@@ -40,12 +40,12 @@ public class BillService {
     }
 
     // Get a specific bill by ID
-    public Bill getBillById(Long billId) {
+    public Bill getBillById(int billId) {
         return billRepository.findById(billId).orElse(null); // Return the bill or null if not found
     }
 
     // Update medicine fees for a bill
-    public Bill updateMedicineFees(Long billId, double medicineFees) {
+    public Bill updateMedicineFees(int billId, double medicineFees) {
         Optional<Bill> billOptional = billRepository.findById(billId);
         if (billOptional.isPresent()) {
             Bill bill = billOptional.get();
@@ -57,7 +57,7 @@ public class BillService {
     }
 
     // Update test charges for a bill
-    public Bill updateTestCharge(Long billId, double testCharge) {
+    public Bill updateTestCharge(int billId, double testCharge) {
         Optional<Bill> billOptional = billRepository.findById(billId);
         if (billOptional.isPresent()) {
             Bill bill = billOptional.get();

@@ -2,6 +2,7 @@ package com.hms.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,45 +13,64 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int doctorId;
+
     @Column(nullable = false)
+    @NotBlank(message = "Doctor name is required")
+    @Size(min = 2, max = 50, message = "Doctor name must be between 2 and 50 characters")
     private String doctorName;
 
     @Column(nullable = false)
+    @NotBlank(message = "Specialization is required")
     private String specialization;
 
     @Column(nullable = false)
+    @NotBlank(message = "Qualification is required")
     private String qualification;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @NotBlank(message = "Contact number is required")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Contact number must be 10 digits")
     private String contactNumber;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "Email ID is required")
+    @Email(message = "Email must be valid")
     private String emailId;
 
     @Column(nullable = false)
+    @NotBlank(message = "Gender is required")
+    @Pattern(regexp = "^(Male|Female|Other)$", message = "Gender must be 'Male', 'Female', or 'Other'")
     private String gender;
 
     @Column(nullable = false)
+    @NotBlank(message = "Location is required")
+    @Size(max = 100, message = "Location must not exceed 100 characters")
     private String location;
 
     @Column(nullable = false)
+    @Positive(message = "Consultation fees must be a positive number")
     private double consultationFees;
 
     @Column(nullable = false)
+    @NotNull(message = "Date of joining is required")
+    @PastOrPresent(message = "Date of joining cannot be in the future")
     private LocalDate dateOfJoining;
 
     @Column(nullable = false)
     private boolean isSurgeon;
 
     @Column(nullable = false)
+    @Positive(message = "Years of experience must be a positive number")
     private int yearsOfExperience;
+
     @OneToMany
-    @JsonIgnore // This annotation ignores the field in JSON serialization/deserialization
+    @JsonIgnore // Ignore this field during serialization/deserialization
     private List<Appointment> appointmentList;
 
-    private boolean status;
+    @Column(nullable = false)
+    private boolean status; // true for active, false for inactive
 
-    // Getters and setters
+    // Getters and Setters
     public int getDoctorId() {
         return doctorId;
     }
@@ -163,3 +183,4 @@ public class Doctor {
         this.status = status;
     }
 }
+

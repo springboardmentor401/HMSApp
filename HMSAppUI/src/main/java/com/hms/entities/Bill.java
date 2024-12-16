@@ -44,7 +44,6 @@ public class Bill {
 	    private double taxes;
 	    @DecimalMin(value = "0.0", inclusive = false, message = "MicellaneousCharge must be greater than 0")
 	    private double  miscellaneousCharge;
-	
 	 private LocalDate billDate;
 	  @OneToMany(mappedBy = "billObj", cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<Payment> pmtList;
