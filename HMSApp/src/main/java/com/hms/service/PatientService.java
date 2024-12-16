@@ -51,7 +51,7 @@ public class PatientService {
     }
 
     private void sendEmailNotification(String email, String subject, String text) {
-        emailService.sendEmail(email, subject, text);  // Call the sendEmail method in EmailService
+       // emailService.sendEmail(email, subject, text);  // Call the sendEmail method in EmailService
     }
 
 
@@ -93,7 +93,7 @@ public class PatientService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
-    public List<Patient> getPatientsByDoctorAndDate(int doctorId, LocalDate appDate) {
+    public List<Patient> getPatientsByDoctorAndDate(Long doctorId, LocalDate appDate) {
         List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);
         if (patients == null || patients.isEmpty()) {
             // Optionally, log or throw a custom exception
@@ -112,6 +112,12 @@ public class PatientService {
 
     
     
+//I have a doctor class ,patient and an appointment class  I want to send a mail notificationto the  the patient   email id one day prior  to the appointement how to do that
+    
+
+
+    //I have an application spring data jpa and springrest .Whenever i add the entity to the database it need to send an email notification to that entity email id
+	
 
 
 

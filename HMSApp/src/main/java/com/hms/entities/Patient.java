@@ -2,17 +2,19 @@ package com.hms.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "patient") // Ensures mapping to the correct table
 public class Patient {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int patientId;
 
     @NotBlank(message = "Patient name is required")
-    @Size(min = 3, max = 50, message = "Patient name must be between 3 and 50 characters")
+    @Pattern(regexp = "^[A-Za-z ]{3,30}$", message = "Name must contain only alphabetic characters and spaces, with a length between 3 and 30 characters.")
     @Column(name = "patient_name") // Maps to the database column 'patient_name'
     private String patientName;
 
@@ -23,50 +25,52 @@ public class Patient {
 
     @Past(message = "Date of birth must be in the past")
     @Column(name = "date_of_birth") // Maps to the database column 'date_of_birth'
+
     private LocalDate dateOfBirth;
 
     @NotBlank(message = "Gender is required")
     @Pattern(regexp = "^(Male|Female|Other)$", message = "Gender must be 'Male', 'Female', or 'Other'")
     @Column(name = "gender") // Maps to the database column 'gender'
     private String gender;
-
-    @NotBlank(message = "Allergy information is required")
-    @Pattern(regexp = "^[A-Za-z,\\s-]+$", message = "Allergy information must contain only alphabetic characters, commas, spaces, and hyphens")
-    @Size(min = 4, max = 200, message = "Allergy information must be between 4 and 200 characters")
-    @Column(name = "allergies") // Maps to the database column 'allergies'
-    private String allergies;
-
-    @NotBlank(message = "Medication information is required")
-    @Pattern(regexp = "^[A-Za-z,\\s.-]+$", message = "Medication information must contain only alphabetic characters, commas, spaces, periods, and hyphens")
-    @Size(min = 4, max = 50, message = "Medication information must be between 4 and 50 characters")
-    @Column(name = "medications") // Maps to the database column 'medications'
-    private String medications;
-
+    
     @NotBlank(message = "Email ID is required")
     @Email(message = "Email ID must be valid")
     @Size(min = 3, max = 50, message = "Email ID must be between 3 and 50 characters")
     @Column(name = "email_id") // Maps to the database column 'email_id'
     private String emailId;
-
+    
     @NotBlank(message = "Location is required")
     @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Location must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
     @Size(min = 3, max = 50, message = "Location must be between 3 and 50 characters")
     @Column(name = "location") // Maps to the database column 'location'
     private String location;
 
-    @NotBlank(message = "Treatment is required")
-    @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Treatment must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
-    @Size(min = 3, max = 50, message = "Treatment must be between 3 and 50 characters")
-    @Column(name = "treatments") // Maps to the database column 'treatments'
-    private String treatments;
+    
+   // @NotBlank(message = "Allergy information is required")
+    @Pattern(regexp = "^[A-Za-z,\\s-]+$", message = "Allergy information must contain only alphabetic characters, commas, spaces, and hyphens")
+    @Size(min = 4, max = 200, message = "Allergy information must be between 4 and 200 characters")
+    @Column(name = "allergies") // Maps to the database column 'allergies'
+    private String allergies;
 
-    @NotBlank(message = "Medical history is required")
+    
     @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Medical history must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
     @Size(min = 3, max = 50, message = "Medical history must be between 3 and 50 characters")
     @Column(name = "medical_history") // Maps to the database column 'medical_history'
     private String medicalHistory;
 
-    @NotBlank(message = "Other information is required")
+    @Pattern(regexp = "^[A-Za-z,\\s.-]+$", message = "Medication information must contain only alphabetic characters, commas, spaces, periods, and hyphens")
+    @Size(min = 4, max = 50, message = "Medication information must be between 4 and 50 characters")
+    @Column(name = "medications") // Maps to the database column 'medications'
+    private String medications;
+
+    @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Treatment must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
+    @Size(min = 3, max = 50, message = "Treatment must be between 3 and 50 characters")
+    @Column(name = "treatments") // Maps to the database column 'treatments'
+    private String treatments;
+
+    
+
+    //@NotBlank(message = "Other information is required")
     @Pattern(regexp = "^[A-Za-z0-9,\\s.-]+$", message = "Other information must contain only alphabetic characters, numbers, commas, spaces, periods, and hyphens")
     @Size(min = 3, max = 50, message = "Other information must be between 3 and 50 characters")
     @Column(name = "others") // Maps to the database column 'others'

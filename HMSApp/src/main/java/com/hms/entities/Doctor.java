@@ -1,92 +1,102 @@
 package com.hms.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.List;
 
-@Entity
-@Table(name = "doctors")
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
+@Entity 
+@Table(name = "doctor")
 public class Doctor {
 
-    @Id
+    @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int doctorId;
+    @Column
+    private Long doctorId;
 
-    @Column(nullable = false)
-    @NotBlank(message = "Doctor name is required")
-    @Size(min = 2, max = 50, message = "Doctor name must be between 2 and 50 characters")
+    @NotBlank(message = "Doctor name cannot be blank")
+    @Size(min = 2, max = 100, message = "Doctor name must be between 2 and 100 characters")
+    @Column(name = "doctor_name", nullable = false, length = 255)
     private String doctorName;
 
-    @Column(nullable = false)
-    @NotBlank(message = "Specialization is required")
+    @NotBlank(message = "Specialization cannot be blank")
+    @Column
     private String specialization;
 
-    @Column(nullable = false)
-    @NotBlank(message = "Qualification is required")
+    @NotBlank(message = "Qualification cannot be blank")
+    @Column
     private String qualification;
 
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Contact number is required")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Contact number must be 10 digits")
+    @NotBlank(message = "Contact number cannot be blank")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Contact number must be a valid 10-digit number")
+    @Column
     private String contactNumber;
 
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Email ID is required")
-    @Email(message = "Email must be valid")
+    @NotBlank(message = "Email ID cannot be blank")
+    @Email(message = "Email ID should be valid")
+    @Column
     private String emailId;
 
-    @Column(nullable = false)
-    @NotBlank(message = "Gender is required")
-    @Pattern(regexp = "^(Male|Female|Other)$", message = "Gender must be 'Male', 'Female', or 'Other'")
+    @NotBlank(message = "Gender cannot be blank")
+    @Pattern(regexp = "^(Male|Female|Other)$", message = "Gender must be one of: Male, Female, or Other")
+    @Column
     private String gender;
 
-    @Column(nullable = false)
-    @NotBlank(message = "Location is required")
-    @Size(max = 100, message = "Location must not exceed 100 characters")
+    @NotBlank(message = "Location cannot be blank")
+    @Column
     private String location;
 
-    @Column(nullable = false)
-    @Positive(message = "Consultation fees must be a positive number")
+    @NotNull(message = "Consultation fees cannot be null")
+    @Min(value = 0, message = "Consultation fees must be greater than or equal to 0")
+    @Column
     private double consultationFees;
 
-    @Column(nullable = false)
-    @NotNull(message = "Date of joining is required")
-    @PastOrPresent(message = "Date of joining cannot be in the future")
+    @NotNull(message = "Date of joining cannot be null")
+    @Column
     private LocalDate dateOfJoining;
 
-    @Column(nullable = false)
+    @NotNull(message = "Surgeon status cannot be null")
+    @Column
     private boolean isSurgeon;
 
-    @Column(nullable = false)
-    @Positive(message = "Years of experience must be a positive number")
+    @NotNull(message = "Years of experience cannot be null")
+    @Min(value = 0, message = "Years of experience must be greater than or equal to 0")
+    @Column
     private int yearsOfExperience;
 
-    @OneToMany
-    @JsonIgnore // Ignore this field during serialization/deserialization
-    private List<Appointment> appointmentList;
+    @NotNull(message = "Status cannot be null")
+    @Column
+    private boolean status;
 
-    @Column(nullable = false)
-    private boolean status; // true for active, false for inactive
+    // Getters and setters
 
-    // Getters and Setters
-    public int getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(int doctorId) {
-        this.doctorId = doctorId;
-    }
+    
 
     public String getDoctorName() {
         return doctorName;
     }
 
-    public void setDoctorName(String doctorName) {
+    public Long getDoctorId() {
+		return doctorId;
+	}
+
+	public void setDoctorId(Long doctorId) {
+		this.doctorId = doctorId;
+	}
+
+	public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
     }
-
     public String getSpecialization() {
         return specialization;
     }
@@ -155,8 +165,8 @@ public class Doctor {
         return isSurgeon;
     }
 
-    public void setSurgeon(boolean surgeon) {
-        isSurgeon = surgeon;
+    public void setSurgeon(boolean isSurgeon) {
+        this.isSurgeon = isSurgeon;
     }
 
     public int getYearsOfExperience() {
@@ -167,14 +177,6 @@ public class Doctor {
         this.yearsOfExperience = yearsOfExperience;
     }
 
-    public List<Appointment> getAppointmentList() {
-        return appointmentList;
-    }
-
-    public void setAppointmentList(List<Appointment> appointmentList) {
-        this.appointmentList = appointmentList;
-    }
-
     public boolean isStatus() {
         return status;
     }
@@ -183,4 +185,3 @@ public class Doctor {
         this.status = status;
     }
 }
-

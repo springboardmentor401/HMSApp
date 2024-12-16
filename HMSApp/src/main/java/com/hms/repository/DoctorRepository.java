@@ -1,11 +1,17 @@
 package com.hms.repository;
 
-import com.hms.entities.Doctor;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
+import com.hms.entities.Doctor;
+
+@Repository
+public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 	
-}
-	
+	List<Doctor> findBySpecialization(String specialization);
+
+
     
-
+}

@@ -104,7 +104,7 @@ public class PatientController {
     
    
    
-    @PutMapping("/updatePatient/{id}")
+    @PostMapping("/update-Patient/{id}")
     public ResponseEntity<?> updatePatientFields(
             @PathVariable int id, 
             @RequestBody Map<String, String> updates) {
@@ -152,8 +152,8 @@ public class PatientController {
 
     @GetMapping("/by-doctor-and-date")
     public ResponseEntity<?> getPatientsByDoctorAndDate(
-            @RequestParam int doctorId,
-            @RequestParam @DateTimeFormat LocalDate appDate) {
+            @RequestParam Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appDate) {
         List<Patient> patients = service.getPatientsByDoctorAndDate(doctorId, appDate);
         
         if (patients == null || patients.isEmpty()) {
