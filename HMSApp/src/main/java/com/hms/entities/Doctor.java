@@ -1,4 +1,4 @@
-package com.hms.entities;
+ package com.hms.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -183,4 +183,3 @@ public class Doctor {
         this.status = status;
     }
 }
-
