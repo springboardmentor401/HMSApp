@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Patients by Medical History</title>
+</head>
+<body>
+    <h1>Search Patients by Medical History</h1>
+
+    <form action="/viewPatientByMedicalHistory" method="get">
+        <label for="medicalHistory">Enter Medical History:</label>
+        <input type="text" id="medicalHistory" name="history" placeholder="e.g., diabetes" required>
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>

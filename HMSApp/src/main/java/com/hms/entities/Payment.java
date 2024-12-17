@@ -2,21 +2,29 @@ package com.hms.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private int paymentId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long paymentId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "bill_id", nullable = false)
-    @NotNull(message = "Bill reference cannot be null")
+    @JsonIgnore
     private Bill billObj;
 
     @NotNull(message = "Transaction ID cannot be null")
@@ -24,30 +32,34 @@ public class Payment {
     private String transactionId;
 
     @NotNull(message = "Payment date cannot be null")
-    @Temporal(TemporalType.DATE)
-    private Date paymentDate;
+    @Temporal(TemporalType.DATE)  // Ensures that only the date part is stored, not the time
+    @DateTimeFormat(pattern = "yyyy-MM-dd") // Bind the date format to yyyy-MM-dd
+    @PastOrPresent(message = "Payment date cannot be in the future")
+    private LocalDate paymentDate;
 
     @Positive(message = "Amount paid must be greater than zero")
     private double amountPaid;
 
     @NotNull(message = "Payment method cannot be null")
-    @Size(min = 3, max = 50, message = "Payment method must be between 3 and 50 characters")
+    @Pattern(regexp = "Cash|Credit Card|Debit Card|Net Banking|UPI", message = "Payment method must be one of the following: Cash, Credit Card, Debit Card, Net Banking, or UPI")
     private String paymentMethod;
 
+
     @NotNull(message = "Payment status cannot be null")
-    @Size(min = 5, max = 20, message = "Payment status must be between 5 and 20 characters")
+    @Pattern(regexp = "Paid|Unpaid|Partially Paid", message = "Payment status must be one of the following: Completed, Unpaid, or Partially Paid")
     @Column(name = "payment_status")
     private String paymentStatus;
+
 
     // Default constructor required by JPA
     public Payment() {}
 
     // Getters and Setters
-    public int getPaymentId() {
+    public Long getPaymentId() {
         return paymentId;
     }
 
-    public void setPaymentId(int paymentId) {
+    public void setPaymentId(long  paymentId) {
         this.paymentId = paymentId;
     }
 
@@ -67,12 +79,12 @@ public class Payment {
         this.transactionId = transactionId;
     }
 
-    public Date getPaymentDate() {
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Date paymentDate) {
-        this.paymentDate = paymentDate;
+    public void setPaymentDate(LocalDate localDate) {
+        this.paymentDate = localDate;
     }
 
     public double getAmountPaid() {

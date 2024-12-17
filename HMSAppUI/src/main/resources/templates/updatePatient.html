@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Patient Information</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Update Patient Information</h2>
+
+        <!-- Check for error message -->
+        <div th:if="${error}" class="alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Update Patient Form -->
+        <form id="updatePatientForm" th:action="@{/update-Patient/{id}(id=${patient.patientId})}" method="post" th:object="${patient}">
+            <!-- Hidden field to simulate PATCH request -->
+            <input type="hidden" name="_method" value="POST"/>
+
+            <!-- Patient ID (Hidden) -->
+            <input type="hidden" th:field="*{patientId}" />
+
+            <!-- Patient Name (Readonly) -->
+            <div class="form-group">
+                <label for="patientName">Name:</label>
+                <input type="text" class="form-control" id="patientName" th:field="*{patientName}" readonly>
+            </div>
+
+            <!-- Contact Number -->
+            <div class="form-group">
+                <label for="contactNumber">Contact Number:</label>
+                <input type="text" class="form-control" id="contactNumber" th:field="*{contactNumber}" required>
+            </div>
+
+            <!-- Date of Birth -->
+			<div>
+			    <label for="dateOfBirth">Date of Birth:</label>
+			    <input type="date" id="dateOfBirth" name="dateOfBirth"
+			           th:value="${patient.dateOfBirth != null ? #temporals.format(patient.dateOfBirth, 'yyyy-MM-dd') : ''}" />
+			</div>
+
+            <!-- Gender -->
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select class="form-control" id="gender" th:field="*{gender}">
+                    <option value="Male" th:selected="*{gender} == 'Male'">Male</option>
+                    <option value="Female" th:selected="*{gender} == 'Female'">Female</option>
+                    <option value="Other" th:selected="*{gender} == 'Other'">Other</option>
+                </select>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="emailId">Email ID:</label>
+                <input type="email" class="form-control" id="emailId" th:field="*{emailId}" required>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" class="form-control" id="location" th:field="*{location}" required>
+            </div>
+
+            <!-- Allergies -->
+            <div class="form-group">
+                <label for="allergies">Allergies:</label>
+                <input type="text" class="form-control" id="allergies" th:field="*{allergies}">
+            </div>
+
+            <!-- Medications -->
+            <div class="form-group">
+                <label for="medications">Medications:</label>
+                <input type="text" class="form-control" id="medications" th:field="*{medications}" required>
+            </div>
+
+            <!-- Treatments -->
+            <div class="form-group">
+                <label for="treatments">Treatments:</label>
+                <input type="text" class="form-control" id="treatments" th:field="*{treatments}" required>
+            </div>
+
+            <!-- Medical History -->
+            <div class="form-group">
+                <label for="medicalHistory">Medical History:</label>
+                <input type="text" class="form-control" id="medicalHistory" th:field="*{medicalHistory}" required>
+            </div>
+
+            <!-- Others -->
+            <div class="form-group">
+                <label for="others">Others:</label>
+                <textarea class="form-control" id="others" th:field="*{others}"></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Update Patient</button>
+        </form>
+
+        <!-- Link to go back to Home -->
+        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
+
+    <script>
+        document.getElementById("updatePatientForm").onsubmit = function(e) {
+            var form = e.target;
+            form.method = "POST"; // Override to POST to simulate PATCH request
+            var method = document.createElement("input");
+            method.setAttribute("type", "hidden");
+            method.setAttribute("name", "_method");
+            method.setAttribute("value", "PATCH");
+            form.appendChild(method);
+        };
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
