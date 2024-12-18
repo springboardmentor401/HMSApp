@@ -28,14 +28,12 @@
             color: #34495e;
             margin-bottom: 30px;
             font-weight: 700;
-            font-size: 28px;
         }
 
         .form-label {
             font-weight: 500;
             color: #555;
             margin-bottom: 10px;
-            font-size: 16px;
         }
 
         .form-control {
@@ -69,12 +67,6 @@
             margin-bottom: 20px;
         }
 
-        .error-message {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
         .row {
             margin-bottom: 20px;
         }
@@ -82,11 +74,26 @@
         .form-group:last-of-type {
             margin-bottom: 0;
         }
+
+        /* Add subtle hover effect on the input fields */
+        input.form-control:hover {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>ADD BILL</h1>
+        <h1>Add Bill</h1>
+		
+		<div th:if="${errorMessage}" style="color:red; text-align: center;">
+		    <p th:text="${errorMessage}"></p>
+		</div>
+		<div th:if="${successMessage}" style="color:green; text-align: center;">
+		    <p th:text="${successMessage}"></p>
+		</div>
+
+						  
+
         <form th:action="@{/fetchConsultationFee}" method="get">
             <div class="form-group row">
                 <label for="appointmentId" class="col-sm-4 form-label">Appointment ID:</label>
@@ -108,20 +115,10 @@
             </div>
         </form>
 
-        <form th:action="@{/addBill/} + ${appointmentId}" th:object="${bill}" method="post">
-            <div class="form-group row">
-                <label for="consultationFees" class="col-sm-4 form-label">Consultation Fees:</label>
-                <div class="col-sm-8">
-                    <input 
-                        type="number" 
-                        id="consultationFees" 
-                        th:field="*{consultationFees}" 
-                        class="form-control" 
-                        >
-                    <div class="error-message" th:if="${#fields.hasErrors('consultationFees')}" th:errors="*{consultationFees}"></div>
-                </div>
-            </div>
+       
 
+        <form th:action="@{/addBill/} + ${appointmentId}" th:object="${bill}" method="post">
+            <!-- Medicine Fees -->
             <div class="form-group row">
                 <label for="medicineFees" class="col-sm-4 form-label">Medicine Fees:</label>
                 <div class="col-sm-8">
@@ -131,11 +128,24 @@
                         th:field="*{medicineFees}" 
                         class="form-control" 
                         step="1" 
-                        >
-                    <div class="error-message" th:if="${#fields.hasErrors('medicineFees')}" th:errors="*{medicineFees}"></div>
+                        required>
+                    <div th:if="${#fields.hasErrors('medicineFees')}" th:errors="*{medicineFees}" style="color:red;"></div>
                 </div>
             </div>
 
+			<div class="form-group row">
+			    <label for="consultationFees" class="col-sm-4 form-label">Consultation Fees:</label>
+			    <div class="col-sm-8">
+			        <input 
+			            type="number" 
+			            id="consultationFees" 
+			            th:field="*{consultationFees}" 
+			            class="form-control" 
+			            required>
+			        <div th:if="${#fields.hasErrors('consultationFees')}" th:errors="*{consultationFees}" style="color:red;"></div>
+			    </div>
+			</div>
+            <!-- Test Charge -->
             <div class="form-group row">
                 <label for="testCharge" class="col-sm-4 form-label">Test Charge:</label>
                 <div class="col-sm-8">
@@ -146,10 +156,11 @@
                         class="form-control" 
                         step="1" 
                         required>
-                    <div class="error-message" th:if="${#fields.hasErrors('testCharge')}" th:errors="*{testCharge}"></div>
+                    <div th:if="${#fields.hasErrors('testCharge')}" th:errors="*{testCharge}" style="color:red;"></div>
                 </div>
             </div>
 
+            <!-- Miscellaneous Charge -->
             <div class="form-group row">
                 <label for="miscellaneousCharge" class="col-sm-4 form-label">Miscellaneous Charge:</label>
                 <div class="col-sm-8">
@@ -160,10 +171,11 @@
                         class="form-control" 
                         step="1" 
                         required>
-                    <div class="error-message" th:if="${#fields.hasErrors('miscellaneousCharge')}" th:errors="*{miscellaneousCharge}"></div>
+                    <div th:if="${#fields.hasErrors('miscellaneousCharge')}" th:errors="*{miscellaneousCharge}" style="color:red;"></div>
                 </div>
             </div>
 
+            <!-- Description -->
             <div class="form-group row">
                 <label for="description" class="col-sm-4 form-label">Description:</label>
                 <div class="col-sm-8">
@@ -173,10 +185,11 @@
                         th:field="*{description}" 
                         class="form-control" 
                         required>
-                    <div class="error-message" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" style="color:red;"></div>
                 </div>
             </div>
 
+            <!-- Submit Button -->
             <div class="form-group row">
                 <div class="col-sm-8 offset-sm-4">
                     <button type="submit" class="btn btn-primary">Add Bill</button>
