@@ -19,6 +19,8 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     
     public List<Patient> findByPatientName(String patientName);
 
+	@Query("SELECT p FROM Patient p LEFT JOIN FETCH p.appointmentList")
+    List<Patient> findAllWithAppointments();
 	
 }
    

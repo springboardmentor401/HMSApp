@@ -20,5 +20,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
 
     @Query("SELECT a.patientObj FROM Appointment a WHERE a.doctorObj.doctorId = :doctorId AND a.appDate = :appDate")
     List<Patient> findPatientsByDoctorAndDate(@Param("doctorId") Long doctorId, @Param("appDate") LocalDate appDate);
+    
+    @Query("SELECT a.patientObj FROM Appointment a WHERE a.status = 'pending'")
+    List<Patient> findPatientsWithpendingAppointments();
+	List<Appointment> findByStatus(String string);
+
 }
 

@@ -45,7 +45,7 @@ public class PatientUIController {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String BASE_URL = "http://localhost:7211";
+    private final String BASE_URL = "http://localhost:7220";
 
     @GetMapping("/")
     public String home() {

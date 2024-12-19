@@ -4,16 +4,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import jakarta.validation.Validator;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.hms.repository.AppointmentRepository;
 import com.hms.repository.PatientRepository;
+import com.hms.entities.Appointment;
 import com.hms.entities.Patient;
 
 import org.springframework.stereotype.Service;
@@ -107,6 +111,63 @@ public class PatientService {
 		return null;
 	}
 	
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    public List<Patient> getPatientsByDoctorAndDate(int doctorId, LocalDate appDate) {
+        List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);
+        if (patients == null || patients.isEmpty()) {
+            // Optionally, log or throw a custom exception
+            return List.of(); // Return empty list if no patients found
+        }
+        return patients;
+    }
+
+    public void deactivateInactivePatients() {
+        List<Patient> patients = patientRepository.findAllWithAppointments(); // Fetch patients with their appointments
+
+        LocalDate twoYearsAgo = LocalDate.now().minusYears(2);  // Date 2 years ago from today
+
+        for (Patient patient : patients) {
+            String isInactive = "INACTIVE";  // Default value is "INACTIVE"
+
+            if (patient.getAppointmentList() != null && !patient.getAppointmentList().isEmpty()) {
+                // Check if the patient has any appointment within the last 2 years
+                boolean hasRecentAppointment = patient.getAppointmentList().stream()
+                        .anyMatch(appointment -> appointment.getAppDate().isAfter(twoYearsAgo));
+                
+                // If there's any recent appointment, set status to "ACTIVE"
+                if (hasRecentAppointment) {
+                    isInactive = "ACTIVE";
+                }
+            }
+
+            // Set the patient's status based on the "isInactive" value
+            patient.setStatus(isInactive);  // Set status as a String ("ACTIVE" or "INACTIVE")
+        }
+
+        // Save updated patients back to the database
+        patientRepository.saveAll(patients);
+    }
+
+    // Scheduled task that runs every day at midnight (you can adjust the cron expression as needed)
+    @Scheduled(cron = "0 0 0 * * ?")  // Runs daily at midnight
+    public void scheduledDeactivation() {
+        deactivateInactivePatients();  // Call the deactivateInactivePatients method to check and update patient status
+    }
+    @Autowired
+
+    public List<Patient> getPatientsWithNoShowAppointments() {
+        // Find all appointments with status "Pending"
+        List<Appointment> pendingAppointments = appointmentRepository.findByStatus("Pending");
+
+        // Extract and return distinct patients associated with pending appointments
+        return pendingAppointments.stream()
+            .map(Appointment::getPatientObj
+    )  // Get the patient associated with the appointment
+            .distinct()  // Ensure patients are not duplicated in case of multiple pending appointments
+            .collect(Collectors.toList());
+}
 }
 
 

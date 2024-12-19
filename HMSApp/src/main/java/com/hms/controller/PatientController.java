@@ -7,16 +7,16 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -104,51 +104,38 @@ public class PatientController {
     
    
    
-    @PostMapping("/update-Patient/{id}")
-    public ResponseEntity<?> updatePatientFields(
-            @PathVariable int id, 
-            @RequestBody Map<String, String> updates) {
+    @PutMapping("/updatePatient/{id}")
+    public ResponseEntity<?> updatePatient(@PathVariable("Id") int id, @RequestBody @Valid Patient updatedPatient, BindingResult result) {
+        // Handle validation errors
+    	
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);  // Return validation errors in the response
+        }
 
-        Patient patient = service.getPatientById(id);
-        if (patient == null) return ResponseEntity.notFound().build();
-
-        updates.forEach((field, value) -> {
-            switch (field) {
-                case "patientName":
-                    patient.setPatientName(value);
-                    break;
-                case "contactNumber":
-                    patient.setContactNumber(value);
-                    break;
-                case "dateOfBirth":
-                    patient.setDateOfBirth(LocalDate.parse(value));
-                    break;
-                case "gender":
-                    patient.setGender(value);
-                    break;
-                case "emailId":
-                    patient.setEmailId(value);
-                    break;
-                case "allergies":
-                    patient.setAllergies(value);
-                    break;
-                case "medications":
-                    patient.setMedications(value);
-                    break;
-                case "treatments":
-                    patient.setTreatments(value);
-                    break;
-                case "medicalHistory":
-                    patient.setMedicalHistory(value);
-                    break;
-                case "others":
-                    patient.setOthers(value);
-                    break;
+        try {
+            // Fetch the existing patient by ID
+            Patient existingPatient = service.getPatientById(id);
+            
+            if (existingPatient == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found."); // Patient not found
             }
-        });
 
-        return ResponseEntity.ok(service.updatePatient(patient));
+            // Ensure the ID is preserved in the updated patient object
+            updatedPatient.setPatientId(id); 
+
+            // Call service to update the patient in the database
+            Patient savedPatient = service.updatePatient(updatedPatient);
+
+            return ResponseEntity.ok(savedPatient); // Return the updated patient in the response
+        } catch (Exception e) {
+            // Handle unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Error updating patient: " + e.getMessage()); // Return error message if something goes wrong
+        }
     }
+
 
     @GetMapping("/by-doctor-and-date")
     public ResponseEntity<?> getPatientsByDoctorAndDate(
@@ -162,7 +149,21 @@ public class PatientController {
         }
         return ResponseEntity.ok(patients);
     }
+    @PutMapping("/deactivate-inactive")
+    public ResponseEntity<String> deactivateInactivePatients() {
+        service.deactivateInactivePatients();
+        return ResponseEntity.ok("Inactive patients have been deactivated successfully.");
+    }
+    @GetMapping("/no-show-report")
+    public List<Patient> getNoShowReport(Model model) {
+        // Fetch patients who have appointments with "Pending" status
+        List<Patient> noShowPatients = service.getPatientsWithNoShowAppointments();
 
+        // Add the list of no-show patients to the model
+        model.addAttribute("noShowPatients", noShowPatients);
+
+        return service.getPatientsWithNoShowAppointments();
+    }
 
 }
     

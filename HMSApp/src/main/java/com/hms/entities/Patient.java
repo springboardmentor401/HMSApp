@@ -3,6 +3,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "patient") // Ensures mapping to the correct table
@@ -78,6 +81,18 @@ public class Patient {
 
     @Column(name = "status") // Maps to the database column 'status'
     private String status;
+
+    @OneToMany(mappedBy = "patientObj", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Appointment> appointmentList;  // List of appointments
+
+	public List<Appointment> getAppointmentList() {
+		return appointmentList;
+	}
+
+	public void setAppointmentList(List<Appointment> appointmentList) {
+		this.appointmentList = appointmentList;
+	}
 
 	public int getPatientId() {
 		return patientId;

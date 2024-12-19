@@ -21,6 +21,7 @@ public class Patient {
     private String medications;
     private String emailId;
     private String location;
+	
     public int getPatientId() {
 		return patientId;
 	}
