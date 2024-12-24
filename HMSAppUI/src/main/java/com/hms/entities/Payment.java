@@ -4,7 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Payment {
@@ -12,12 +16,18 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private int paymentId;
+    private Long paymentId;
 
     @ManyToOne
     @JoinColumn(name = "bill_id", nullable = false)
     @NotNull(message = "Bill reference cannot be null")
+    @JsonIgnore
     private Bill billObj;
+
+    @ManyToOne
+    @JoinColumn(name = "appointment_id") 
+    @JsonIgnore// Adding the appointment reference here
+    private Appointment appointment;
 
     @NotNull(message = "Transaction ID cannot be null")
     @Size(min = 10, max = 50, message = "Transaction ID must be between 10 and 50 characters")
@@ -25,7 +35,7 @@ public class Payment {
 
     @NotNull(message = "Payment date cannot be null")
     @Temporal(TemporalType.DATE)
-    private Date paymentDate;
+    private LocalDate paymentDate;
 
     @Positive(message = "Amount paid must be greater than zero")
     private double amountPaid;
@@ -43,11 +53,11 @@ public class Payment {
     public Payment() {}
 
     // Getters and Setters
-    public int getPaymentId() {
+    public long getPaymentId() {
         return paymentId;
     }
 
-    public void setPaymentId(int paymentId) {
+    public void setPaymentId(long paymentId) {
         this.paymentId = paymentId;
     }
 
@@ -59,6 +69,14 @@ public class Payment {
         this.billObj = billObj;
     }
 
+    public Appointment getAppointment() {
+        return appointment;
+    }
+
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
+    }
+
     public String getTransactionId() {
         return transactionId;
     }
@@ -67,11 +85,11 @@ public class Payment {
         this.transactionId = transactionId;
     }
 
-    public Date getPaymentDate() {
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(Date paymentDate) {
+    public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
     }
 

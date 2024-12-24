@@ -13,12 +13,13 @@ import java.util.List;
 
 
 @Entity
+@JsonIgnoreProperties("pmtList")
 public class Bill {
 	 @Id
 	
 	 @GeneratedValue(strategy = GenerationType.IDENTITY) 
 	 @Column(name = "bill_id")
-	 private int billId;
+	 private long billId;
 	 @OneToOne
 	 @JoinColumn(name = "appointment_id", nullable = false)
 	 @JsonIgnoreProperties("billObj")
@@ -42,18 +43,37 @@ public class Bill {
 
 	    @DecimalMin(value = "0.0", inclusive = true, message = "Taxes cannot be negative")
 	    private double taxes;
-	    @DecimalMin(value = "0.0", inclusive = false, message = "MicellaneousCharge must be greater than 0")
-	    private double  miscellaneousCharge;
+	
 	 private LocalDate billDate;
 	  @OneToMany(mappedBy = "billObj", cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<Payment> pmtList;
 	   
-	   
+	  @DecimalMin(value = "0.0", inclusive = false, message = "Miscellaneous charge must be greater than 0")
+	  private double  miscellaneousCharge;
 		
-	   
+	  private double totalAmount; // Persisted field
+
+	    @Transient
+	    private double totalPaid; // 
 	   
 	  
     
+	public double getTotalAmount() {
+			return totalAmount;
+		}
+
+		public void setTotalAmount(double totalAmount) {
+			this.totalAmount = totalAmount;
+		}
+
+		public double getTotalPaid() {
+			return totalPaid;
+		}
+
+		public void setTotalPaid(double totalPaid) {
+			this.totalPaid = totalPaid;
+		}
+
 	public LocalDate getBillDate() {
 		return billDate;
 	}
@@ -65,39 +85,35 @@ public class Bill {
 	public double getTestCharge() {
 		return testCharge;
 	}
-
-	
-     public Bill(int billId, double consultationFees, double medicineFees, double testCharge, double miscellaneousCharge,
-			String description, float discountPercentage,
-			double taxes, LocalDate billDate, Appointment appointment, List<Payment> pmtList) {
-		super();
-		this.billId = billId;
-		this.consultationFees = consultationFees;
-		this.medicineFees = medicineFees;
-		this.testCharge = testCharge;
-		this.miscellaneousCharge = miscellaneousCharge;
-		this.description = description;
-		
-		
-		this.discountPercentage = discountPercentage;
-		this.taxes = taxes;
-		this.billDate = billDate;
-		this.appointment = appointment;
-		this.pmtList = pmtList;
-	}
-
-	
+	 
+	 public Bill(long billId, double consultationFees, double medicineFees, double testCharge, double miscellaneousCharge,
+             String description, float discountPercentage, double taxes, LocalDate billDate, 
+             Appointment appointment, List<Payment> pmtList, double totalAmount, double totalPaid) {
+     this.billId = billId;
+     this.consultationFees = consultationFees;
+     this.medicineFees = medicineFees;
+     this.testCharge = testCharge;
+     this.miscellaneousCharge = miscellaneousCharge;
+     this.description = description;
+     this.discountPercentage = discountPercentage;
+     this.taxes = taxes;
+     this.billDate = billDate;
+     this.appointment = appointment;
+     this.pmtList = pmtList;
+     this.totalAmount = totalAmount;
+     this.totalPaid = totalPaid;
+ }
    
   
     
     public Bill() {}
 
-	public int  getBillId() {
+	public long  getBillId() {
 		return billId;
 	}
 
-	public void setBillId(int billId) {
-		this.billId = billId;
+	public void setBillId(long l) {
+		this.billId = l;
 	}
 
 	public double getConsultationFees() {
@@ -173,6 +189,11 @@ public class Bill {
 
 	public void setPmtList(List<Payment> pmtList) {
 		this.pmtList = pmtList;
+	}
+
+	public void setStatus(String string) {
+		// TODO Auto-generated method stub
+		
 	}
    
 }
