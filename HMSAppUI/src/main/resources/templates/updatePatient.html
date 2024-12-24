@@ -48,6 +48,11 @@
             border-radius: 4px;
         }
 
+        input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
         .radio-group {
             display: flex;
             gap: 20px;
@@ -96,50 +101,38 @@
             <!-- Hidden field for patientId -->
             <input type="hidden" th:field="*{patientId}" />
 
-            <!-- Patient Name -->
+            <!-- Patient Name (Read-only) -->
             <div class="form-group">
                 <label for="patientName">Patient Name:</label>
-                <input type="text" id="patientName" th:field="*{patientName}" required />
-                <p th:if="${#fields.hasErrors('patientName')}" th:errors="*{patientName}" class="text-danger"></p>
+                <input type="text" id="patientName" th:field="*{patientName}" readonly />
             </div>
 
-            <!-- Contact Number -->
+            <!-- Date of Birth (Read-only) -->
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth:</label>
+                <input type="text" id="dateOfBirth" th:field="*{dateOfBirth}" readonly />
+            </div>
+
+            <!-- Contact Number (Read-only) -->
             <div class="form-group">
                 <label for="contactNumber">Contact Number:</label>
-                <input type="text" id="contactNumber" th:field="*{contactNumber}" required />
-                <p th:if="${#fields.hasErrors('contactNumber')}" th:errors="*{contactNumber}" class="text-danger"></p>
+                <input type="text" id="contactNumber" th:field="*{contactNumber}" readonly />
             </div>
 
-            <!-- Gender -->
+            <!-- Gender (Read-only) -->
             <div class="form-group">
                 <label>Gender:</label>
                 <div class="radio-group">
-                    <label><input type="radio" name="gender" value="Male" th:field="*{gender}" /> Male</label>
-                    <label><input type="radio" name="gender" value="Female" th:field="*{gender}" /> Female</label>
-                    <label><input type="radio" name="gender" value="Other" th:field="*{gender}" /> Other</label>
+                    <label><input type="radio" name="gender" value="Male" th:field="*{gender}" disabled /> Male</label>
+                    <label><input type="radio" name="gender" value="Female" th:field="*{gender}" disabled /> Female</label>
+                    <label><input type="radio" name="gender" value="Other" th:field="*{gender}" disabled /> Other</label>
                 </div>
-                <p th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="text-danger"></p>
             </div>
 
-            <!-- Allergies -->
-            <div class="form-group">
-                <label for="allergies">Allergies:</label>
-                <input type="text" id="allergies" th:field="*{allergies}" />
-                <p th:if="${#fields.hasErrors('allergies')}" th:errors="*{allergies}" class="text-danger"></p>
-            </div>
-
-            <!-- Medications -->
-            <div class="form-group">
-                <label for="medications">Medications:</label>
-                <input type="text" id="medications" th:field="*{medications}" />
-                <p th:if="${#fields.hasErrors('medications')}" th:errors="*{medications}" class="text-danger"></p>
-            </div>
-
-            <!-- Email ID -->
+            <!-- Email ID (Read-only) -->
             <div class="form-group">
                 <label for="emailId">Email:</label>
-                <input type="email" id="emailId" th:field="*{emailId}" required />
-                <p th:if="${#fields.hasErrors('emailId')}" th:errors="*{emailId}" class="text-danger"></p>
+                <input type="email" id="emailId" th:field="*{emailId}" readonly />
             </div>
 
             <!-- Location -->
@@ -149,25 +142,34 @@
                 <p th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="text-danger"></p>
             </div>
 
+            <!-- Allergies -->
+            <div class="form-group">
+                <label for="allergies">Allergies:</label>
+                <input type="text" id="allergies" th:field="*{allergies}" />
+            </div>
+
+            <!-- Medications -->
+            <div class="form-group">
+                <label for="medications">Medications:</label>
+                <input type="text" id="medications" th:field="*{medications}" />
+            </div>
+
             <!-- Treatments -->
             <div class="form-group">
                 <label for="treatments">Treatments:</label>
                 <input type="text" id="treatments" th:field="*{treatments}" />
-                <p th:if="${#fields.hasErrors('treatments')}" th:errors="*{treatments}" class="text-danger"></p>
             </div>
 
             <!-- Medical History -->
             <div class="form-group">
                 <label for="medicalHistory">Medical History:</label>
                 <input type="text" id="medicalHistory" th:field="*{medicalHistory}" />
-                <p th:if="${#fields.hasErrors('medicalHistory')}" th:errors="*{medicalHistory}" class="text-danger"></p>
             </div>
 
             <!-- Other Details -->
             <div class="form-group">
                 <label for="others">Other Details:</label>
                 <input type="text" id="others" th:field="*{others}" />
-                <p th:if="${#fields.hasErrors('others')}" th:errors="*{others}" class="text-danger"></p>
             </div>
 
             <!-- Submit Button -->

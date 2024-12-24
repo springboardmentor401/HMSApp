@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>No-Show Patients Report</title>
+</head>
+<body>
+    <h1>No-Show Patients</h1>
+
+    <!-- Display error message if any -->
+    <p th:if="${error != null}" th:text="${error}" style="color: red;"></p>
+
+    <!-- Check if the noShowPatients list has data -->
+    <div th:if="${noShowPatients != null}">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Contact Number</th>
+                    <th>Date of Birth</th>
+                    <th>Gender</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Allergies</th>
+                    <th>Medications</th>
+                    <th>Treatments</th>
+                    <th>Medical History</th>
+                    <th>Others</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Iterate through the list of no-show patients -->
+                <tr th:each="patient : ${noShowPatients}">
+                    <td th:text="${patient.patientId}"></td>
+                    <td th:text="${patient.patientName}"></td>
+                    <td th:text="${patient.contactNumber}"></td>
+                    <td th:text="${patient.dateOfBirth}"></td>
+                    <td th:text="${patient.gender}"></td>
+                    <td th:text="${patient.emailId}"></td>
+                    <td th:text="${patient.location}"></td>
+                    <td th:text="${patient.allergies}"></td>
+                    <td th:text="${patient.medications}"></td>
+                    <td th:text="${patient.treatments}"></td>
+                    <td th:text="${patient.medicalHistory}"></td>
+                    <td th:text="${patient.others}"></td>
+                    <td th:text="${patient.status}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Display a message if no data is found -->
+    <p th:if="${noShowPatients == null || noShowPatients.isEmpty()}">No data to display.</p>
+</body>
+</html>
