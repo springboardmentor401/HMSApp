@@ -12,6 +12,8 @@ import com.hms.entities.Appointment;
 import com.hms.entities.Bill;
 
 public interface BillRepository extends JpaRepository<Bill, Integer> {
+	
+	 Bill findByAppointment_AppointmentId(int appointmentId); 
 	 Optional<Bill> findByAppointment(Appointment appointment);
 	 @Query("SELECT b, SUM(IFNULL(p.amountPaid, 0)) AS totalPaid " +
 		       "FROM Bill b LEFT JOIN b.pmtList p " +

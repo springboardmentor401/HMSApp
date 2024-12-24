@@ -31,6 +31,11 @@ public class PaymentService {
         this.billRepo = billRepo;
         this.emailService = emailService;
     }
+    
+    public List<Payment> getPaymentsByPatientId(int patientId) {
+        return paymentRepository.findByBillObj_Appointment_PatientObj_PatientId(patientId);
+    }
+    
 
     @Transactional
     public Payment addPayment(Payment payment, int billId) throws InvalidEntityException {

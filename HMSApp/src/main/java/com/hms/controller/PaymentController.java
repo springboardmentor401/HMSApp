@@ -3,25 +3,43 @@ package com.hms.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import com.hms.entities.Appointment;
 import com.hms.entities.Bill;
+import com.hms.entities.Doctor;
+import com.hms.entities.Patient;
 import com.hms.entities.Payment;
 import com.hms.exception.InvalidEntityException;
+import com.hms.repository.AppointmentRepository;
 import com.hms.repository.BillRepository;
+import com.hms.repository.DoctorRepository;
+import com.hms.repository.PatientRepository;
+import com.hms.repository.PaymentRepository;
 import com.hms.service.BillService;
+import com.hms.service.DoctorService;
 import com.hms.service.PaymentService;
 import com.hms.exception.*;
 import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -37,8 +55,87 @@ public class PaymentController {
     
     @Autowired
     private BillRepository billRepository;
+    
+    
+   
+   
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+ 
+    
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    // Backend logic for calculating doctor revenue (this could be called via AJAX or a normal GET request)
+    @GetMapping("/revenue-breakdown")
+    @ResponseBody
+    public Map<String, Object> calculateDoctorRevenueWithBreakdown(@RequestParam("doctorId") Integer doctorId) {
+        // Step 1: Fetch the doctor by ID
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid doctor ID"));
+
+        // Step 2: Get all appointments for the doctor
+        List<Appointment> appointments = appointmentRepository.findByDoctorObj_DoctorId(doctorId);
+
+        // Step 3: Initialize revenue calculation
+        double totalRevenue = 0.0;
+        List<Map<String, Object>> appointmentBreakdown = new ArrayList<>();
+
+        // Step 4: Calculate revenue per appointment
+        for (Appointment appointment : appointments) {
+            Bill bill = billRepository.findByAppointment_AppointmentId(appointment.getAppointmentId());
+            if (bill != null) {
+                // Fetch all payments for the bill using the newly created method
+                List<Payment> payments = paymentRepository.findByBillObj_BillId(bill.getBillId());
+
+                // Calculate total paid amount for this bill
+                double paidAmount = payments.stream().mapToDouble(Payment::getAmountPaid).sum();
+
+                // Accumulate the total revenue
+                totalRevenue += paidAmount;
+
+                // Prepare appointment breakdown
+                Map<String, Object> appointmentData = new HashMap<>();
+                appointmentData.put("appointmentId", appointment.getAppointmentId());
+                appointmentData.put("patientId", appointment.getPatientObj().getPatientId());
+                appointmentData.put("patientName", appointment.getPatientObj().getPatientName());
+                appointmentData.put("billId", bill.getBillId());
+                appointmentData.put("description", bill.getDescription());
+                appointmentData.put("totalBillAmount", bill.getTotalAmount());
+                appointmentData.put("paidAmount", paidAmount); // Total payments made
+                appointmentData.put("remainingAmount", bill.getTotalAmount() - paidAmount);
+
+                // Add the data to the breakdown list
+                appointmentBreakdown.add(appointmentData);
+            }
+        }
+
+        // Step 5: Prepare the response
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalRevenue", totalRevenue); // Sum of all paid amounts
+        response.put("currency", "INR");
+        response.put("breakdown", appointmentBreakdown); // Detailed breakdown
+
+        return response; // Return as JSON
+    }
+
+    
+    
 
     // Add a payment and send email notification
+    @GetMapping("/patient/{patientId}")
+    public ResponseEntity<List<Payment>> getPaymentsByPatientId(@PathVariable("patientId") int patientId) {
+        List<Payment> payments = service.getPaymentsByPatientId(patientId);
+
+        if (payments.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Return 204 if no payments found
+        }
+        return ResponseEntity.ok(payments);
+    }
 
     @PostMapping("/submit-payment")
     public ResponseEntity<Void> processPayment(@RequestParam int billId,
@@ -66,7 +163,8 @@ public class PaymentController {
             payment.setPaymentStatus(paymentStatus);
             payment.setTransactionId(transactionId);
             service.addPayment(payment, billId);
-
+            
+            service.sendPaymentConfirmationEmail(payment);
             // Update the bill's total paid amount
             double updatedTotalPaid = bill.getTotalPaid() + paymentAmount;
             bill.setTotalPaid(updatedTotalPaid);
@@ -169,9 +267,4 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payment not found");
         }
     }
-<<<<<<< HEAD
-} 
- 
-=======
 }
->>>>>>> 222e14d181d33ad720c53f7cddefd356ea4379af

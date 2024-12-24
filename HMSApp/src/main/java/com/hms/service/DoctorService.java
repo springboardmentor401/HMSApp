@@ -31,7 +31,7 @@ public class DoctorService {
     }
 
     // Get a doctor by ID
-    public Doctor getDoctorById(Long id) {
+    public Doctor getDoctorById(int id) {
         System.out.println("Fetching doctor with ID: " + id);
         return doctorRepository.findById(id)
                 .orElseThrow(() -> {
@@ -41,7 +41,7 @@ public class DoctorService {
     }
 
     // Update a doctor
-    public Doctor updateDoctor(Long id, Doctor updatedDoctor) {
+    public Doctor updateDoctor(int id, Doctor updatedDoctor) {
         System.out.println("Updating doctor with ID: " + id + " using data: " + updatedDoctor);
         Optional<Doctor> optionalDoctor = doctorRepository.findById(id);
 

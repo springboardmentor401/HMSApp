@@ -1,6 +1,7 @@
 package com.hms.controller;
 
-import com.hms.entity.Doctor;
+import com.hms.entities.Doctor;
+
 import com.hms.exception.InvalidEntityException;
 import com.hms.service.DoctorService;
 import jakarta.validation.Valid;

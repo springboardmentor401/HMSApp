@@ -94,8 +94,7 @@ public class PatientService {
         return updatedPatient;
     }
     // Optional: Fetch patient by ID (if needed for PATCH requests)
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+ 
 
     public List<Patient> getPatientsByDoctorAndDate(Long doctorId, LocalDate appDate) {
         List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);

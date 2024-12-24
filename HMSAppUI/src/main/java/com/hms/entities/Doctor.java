@@ -1,4 +1,4 @@
-package com.hmsui.model;
+package com.hms.entities;
 
 import java.time.LocalDate;
 
