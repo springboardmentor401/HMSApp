@@ -1,17 +1,18 @@
 package com.hms.controller;
 
 import com.hms.entities.Doctor;
-
 import com.hms.exception.InvalidEntityException;
 import com.hms.service.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+
+
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,14 +79,33 @@ public class DoctorController {
  
  
  // Get doctors by specialization
-    @GetMapping("/getBySpecialization/{specialization}")
-    public ResponseEntity<?> getDoctorsBySpecialization(@PathVariable String specialization) throws InvalidEntityException {
-       
-            List<Doctor> doctors = doctorService.getDoctorsBySpecialization(specialization);
-            if (doctors.isEmpty()) {
-                return new ResponseEntity<>("No doctors found for this specialization", HttpStatus.NOT_FOUND);
+        @GetMapping("/getBySpecialization/{specialization}")
+        public ResponseEntity<?> getDoctorsBySpecialization(@PathVariable String specialization) {
+            try {
+                // Fetch only active doctors by specialization
+                List<Doctor> activeDoctors = doctorService.getDoctorsBySpecialization(specialization);
+                if (activeDoctors.isEmpty()) {
+                    return new ResponseEntity<>("No active doctors found for this specialization", HttpStatus.NOT_FOUND);
+                }
+                return new ResponseEntity<>(activeDoctors, HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Error while fetching doctors: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            return new ResponseEntity<>(doctors, HttpStatus.OK);
         } 
+    @GetMapping("/free-slots")
+    public ResponseEntity<List<String>> getFreeSlots(
+            @RequestParam int doctorId,
+            @RequestParam String date,
+            @RequestParam String clinicStartTime,
+            @RequestParam String clinicEndTime) {
+
+        LocalDate appointmentDate = LocalDate.parse(date);
+        LocalTime start = LocalTime.parse(clinicStartTime.trim());
+        LocalTime end = LocalTime.parse(clinicEndTime.trim());
+        
+
+        List<String> freeSlots = doctorService.getDoctorFreeSlots(doctorId, appointmentDate, start, end);
+        return ResponseEntity.ok(freeSlots);
+    }
 
 }
