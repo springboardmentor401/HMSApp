@@ -119,13 +119,13 @@
                 <input type="text" id="contactNumber" th:field="*{contactNumber}" readonly />
             </div>
 
-            <!-- Gender (Read-only) -->
+            <!-- Gender (Editable) -->
             <div class="form-group">
                 <label>Gender:</label>
                 <div class="radio-group">
-                    <label><input type="radio" name="gender" value="Male" th:field="*{gender}" disabled /> Male</label>
-                    <label><input type="radio" name="gender" value="Female" th:field="*{gender}" disabled /> Female</label>
-                    <label><input type="radio" name="gender" value="Other" th:field="*{gender}" disabled /> Other</label>
+                    <label><input type="radio" name="gender" value="Male" th:field="*{gender}" /> Male</label>
+                    <label><input type="radio" name="gender" value="Female" th:field="*{gender}" /> Female</label>
+                    <label><input type="radio" name="gender" value="Other" th:field="*{gender}" /> Other</label>
                 </div>
             </div>
 
@@ -135,7 +135,7 @@
                 <input type="email" id="emailId" th:field="*{emailId}" readonly />
             </div>
 
-            <!-- Location -->
+            <!-- Location (Required) -->
             <div class="form-group">
                 <label for="location">Location:</label>
                 <input type="text" id="location" th:field="*{location}" required />

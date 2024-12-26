@@ -95,11 +95,15 @@ public class PatientUIController {
                 Patient.class
             );
             model.addAttribute("patient", response.getBody());
-        } catch (HttpClientErrorException e) {
+            return "viewPatientById";
+            
+        } 
+        catch (HttpClientErrorException e) {
             Map<String, String> errors = parseBackendErrors(e);
             model.addAttribute("error", errors != null ? errors.get("message") : "Patient not found.");
+            return "viewPatientByIdForm";
         }
-        return "viewPatientById";
+        //return "viewPatientByIdForm";
     }
 
     @GetMapping("/viewPatientByNameForm")
@@ -112,10 +116,12 @@ public class PatientUIController {
         try {
             ResponseEntity<List> response = restTemplate.getForEntity(BASE_URL + "/api/patient/viewPatientByName/" + name, List.class);
             model.addAttribute("patients", response.getBody());
+            return "viewPatientByName";
         } catch (Exception e) {
             model.addAttribute("error", "No patients found with the name: " + name);
+            return "viewPatientByNameForm";
         }
-        return "viewPatientByName";
+        //return "viewPatientByName";
     }
 
     @GetMapping("/updatePatientForm")
@@ -146,8 +152,9 @@ public class PatientUIController {
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
 
+            // Ensure the URL is correctly formed with patientId as a path variable
             ResponseEntity<Patient> response = restTemplate.exchange(
-                BASE_URL + "/api/patient/updatePatient/" + patient.getPatientId(),
+                BASE_URL + "/api/patient/updatePatient/" + patient.getPatientId(), // Correct path variable used here
                 HttpMethod.PUT,
                 request,
                 Patient.class
@@ -175,10 +182,12 @@ public class PatientUIController {
         try {
             ResponseEntity<List> response = restTemplate.getForEntity(BASE_URL + "/api/patient/viewPatientByMedicalHistory/" + medicalHistory, List.class);
             model.addAttribute("patients", response.getBody());
+            return "viewPatientByMedicalHistory";
         } catch (Exception e) {
             model.addAttribute("error", "No patients found with the medical history: " + medicalHistory);
+            return "viewPatientByMedicalHistoryForm";
         }
-        return "viewPatientByMedicalHistory";
+        //return "viewPatientByMedicalHistory";
     }
 
     @GetMapping("/viewPatientsByDoctorAndDateForm")
@@ -187,16 +196,24 @@ public class PatientUIController {
     }
 
     @GetMapping("/viewPatientsByDoctorAndDate")
-    public String viewPatientsByDoctorAndDate(@RequestParam int doctorId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appDate, Model model) {
+    public String viewPatientsByDoctorAndDate(
+            @RequestParam(name = "doctorId") int doctorId,
+            @RequestParam(name = "appDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appDate,
+            Model model) {
         try {
             ResponseEntity<List> response = restTemplate.getForEntity(
-                BASE_URL + "/api/patient/by-doctor-and-date?doctorId=" + doctorId + "&appDate=" + appDate, List.class);
+                    BASE_URL + "/api/patient/by-doctor-and-date?doctorId=" + doctorId + "&appDate=" + appDate, 
+                    List.class);
+
             model.addAttribute("patients", response.getBody());
+            return "viewPatientsByDoctorAndDate";
         } catch (Exception e) {
-            model.addAttribute("error", "No patients found for doctorId: " + doctorId + " on date: " + appDate);
+            model.addAttribute("error", 
+                    "No patients found for doctorId: " + doctorId + " on date: " + appDate + ". Error: " + e.getMessage());
+            return "viewPatientsByDoctorAndDateForm";
         }
-        return "viewPatientsByDoctorAndDate";
     }
+
 
     @GetMapping("/no-show-patients")
     public String getNoShowPatients(Model model) {
