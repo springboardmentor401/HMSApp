@@ -1,119 +1,83 @@
 package com.hms.entities;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
-
 import java.time.LocalDate;
-import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@Entity
 public class Payment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
-    private Long paymentId;
+	private Long paymentId;
+	private Bill billObj;
+	private Appointment appointment;
+	private String transactionId;
+	private LocalDate paymentDate;
+	private double amountPaid;
+	private String paymentMethod;
+	private String paymentStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "bill_id", nullable = false)
-    @NotNull(message = "Bill reference cannot be null")
-    @JsonIgnore
-    private Bill billObj;
+	// Default constructor required by JPA
+	public Payment() {}
 
-    @ManyToOne
-    @JoinColumn(name = "appointment_id") 
-    @JsonIgnore// Adding the appointment reference here
-    private Appointment appointment;
+	// Getters and Setters
+	public long getPaymentId() {
+		return paymentId;
+	}
 
-    @NotNull(message = "Transaction ID cannot be null")
-    @Size(min = 10, max = 50, message = "Transaction ID must be between 10 and 50 characters")
-    private String transactionId;
+	public void setPaymentId(long paymentId) {
+		this.paymentId = paymentId;
+	}
 
-    @NotNull(message = "Payment date cannot be null")
-    @Temporal(TemporalType.DATE)
-    private LocalDate paymentDate;
+	public Bill getBillObj() {
+		return billObj;
+	}
 
-    @Positive(message = "Amount paid must be greater than zero")
-    private double amountPaid;
+	public void setBillObj(Bill billObj) {
+		this.billObj = billObj;
+	}
 
-    @NotNull(message = "Payment method cannot be null")
-    @Size(min = 3, max = 50, message = "Payment method must be between 3 and 50 characters")
-    private String paymentMethod;
+	public Appointment getAppointment() {
+		return appointment;
+	}
 
-    @NotNull(message = "Payment status cannot be null")
-    @Size(min = 5, max = 20, message = "Payment status must be between 5 and 20 characters")
-    @Column(name = "payment_status")
-    private String paymentStatus;
+	public void setAppointment(Appointment appointment) {
+		this.appointment = appointment;
+	}
 
-    // Default constructor required by JPA
-    public Payment() {}
+	public String getTransactionId() {
+		return transactionId;
+	}
 
-    // Getters and Setters
-    public long getPaymentId() {
-        return paymentId;
-    }
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
 
-    public void setPaymentId(long paymentId) {
-        this.paymentId = paymentId;
-    }
+	public LocalDate getPaymentDate() {
+		return paymentDate;
+	}
 
-    public Bill getBillObj() {
-        return billObj;
-    }
+	public void setPaymentDate(LocalDate paymentDate) {
+		this.paymentDate = paymentDate;
+	}
 
-    public void setBillObj(Bill billObj) {
-        this.billObj = billObj;
-    }
+	public double getAmountPaid() {
+		return amountPaid;
+	}
 
-    public Appointment getAppointment() {
-        return appointment;
-    }
+	public void setAmountPaid(double amountPaid) {
+		this.amountPaid = amountPaid;
+	}
 
-    public void setAppointment(Appointment appointment) {
-        this.appointment = appointment;
-    }
+	public String getPaymentMethod() {
+		return paymentMethod;
+	}
 
-    public String getTransactionId() {
-        return transactionId;
-    }
+	public void setPaymentMethod(String paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
+	public String getPaymentStatus() {
+		return paymentStatus;
+	}
 
-    public LocalDate getPaymentDate() {
-        return paymentDate;
-    }
-
-    public void setPaymentDate(LocalDate paymentDate) {
-        this.paymentDate = paymentDate;
-    }
-
-    public double getAmountPaid() {
-        return amountPaid;
-    }
-
-    public void setAmountPaid(double amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
 }
