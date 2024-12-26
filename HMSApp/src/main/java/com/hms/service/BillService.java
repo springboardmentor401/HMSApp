@@ -1,10 +1,19 @@
 package com.hms.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +24,6 @@ import com.hms.repository.AppointmentRepository;
 import com.hms.repository.BillRepository;
 
 import jakarta.mail.MessagingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-
-import jakarta.mail.MessagingException;
-
 
 @Service
 public class BillService {
@@ -46,7 +44,6 @@ public class BillService {
         }
         return billRepository.findPaidBillsByPatientAndDateRange(patientId, startDate, endDate);
     }
-
     public Bill generateAndSendBill(Bill bill, int appointmentId) throws MessagingException, InvalidEntityException, IOException {
         // Check if a bill already exists for the appointment
         if (billExistsForAppointment(appointmentId)) {
@@ -113,6 +110,14 @@ public class BillService {
         } else {
             return getAllBills(); // Fetch all bills
         }
+    }
+    public List<Bill> getPaidBillsByPeriod(LocalDate startDate, LocalDate endDate) {
+        // If both start and end dates are provided, fetch the paid bills for the period
+        if (startDate != null && endDate != null) {
+            return billRepository.findPaidBillsByPeriod(startDate, endDate);
+        }
+        // If no date range is provided, return an empty list or handle as needed
+        return new ArrayList<>(); // or you can throw an exception or return all bills, based on your requirement
     }
     private void sendBillEmailHtmlFormat(Bill generatedBill, double totalAmount) throws MessagingException, IOException {
         String patientEmail = generatedBill.getAppointment().getPatientObj().getEmailId();
@@ -232,7 +237,6 @@ public class BillService {
     }
 
 
-
     private void sendBillEmailHtmlFormatt(Bill generatedBill, double totalAmount) throws MessagingException {
         String patientEmail = generatedBill.getAppointment().getPatientObj().getEmailId();
         String patientName = generatedBill.getAppointment().getPatientObj().getPatientName();
@@ -290,6 +294,7 @@ public class BillService {
 
         return totalAmount;
     }
+
 
     // Get all bills
     public List<Bill> getAllBills() {
@@ -350,4 +355,56 @@ public class BillService {
     	   bill.setTestCharge(testCharge);  // Update the medicine fees
            return billRepository.save(bill);
     }
+    
+    
+    //unpaidbillforallpateint
+    
+    public List<Map<String, Object>> getUnpaidBills(String patientId, LocalDate startDate, LocalDate endDate) {
+        List<Object[]> results = billRepository.findUnpaidBills(patientId, startDate, endDate);
+
+        List<Map<String, Object>> unpaidBills = new ArrayList<>();
+        for (Object[] result : results) {
+            Map<String, Object> billData = new HashMap<>();
+            Bill bill = (Bill) result[0];
+            String patientName = (String) result[1];
+            Double totalAmount = (Double) result[2];
+            LocalDate billDate = (LocalDate) result[3];
+            Double totalPaid = (Double) result[4];
+
+            // Calculate the remaining amount
+            Double remainingAmount = totalAmount - totalPaid;
+
+            billData.put("billId", bill.getBillId());
+            billData.put("patientName", patientName);
+            billData.put("totalAmount", totalAmount);
+            billData.put("billDate", billDate);
+            billData.put("totalPaid", totalPaid);
+            billData.put("remainingAmount", remainingAmount);
+
+            unpaidBills.add(billData);
+        }
+
+        return unpaidBills;
+    }
+    public double calculateTotalAmountt( Bill bill) {
+        // Calculate the total amount before applying discount and tax
+        double totalAmount = bill.getConsultationFees() +
+                bill.getMedicineFees() +
+                bill.getTestCharge() +
+                bill.getMiscellaneousCharge(); // Ensure this field exists in Bill
+
+        // Apply discount if percentage is provided (greater than 0)
+        double discountPercentage = bill.getDiscountPercentage();
+        if (discountPercentage > 0) {
+            totalAmount -= totalAmount * (discountPercentage / 100);
+        }
+
+        // Apply a fixed tax rate of 18%
+        double taxAmount = totalAmount * 0.18; // 18% tax
+        totalAmount += taxAmount;
+
+        return totalAmount;
+    }
+
+
 }

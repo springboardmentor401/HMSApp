@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>View Unpaid Bills</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>View Unpaid Bills</h1>
+
+    <!-- Filter Form -->
+    <form th:action="@{/patients/pending}" method="get">
+        <div>
+            <label for="patientId">Patient ID:</label>
+            <input type="text" id="patientId" name="patientId" placeholder="Enter Patient ID" required>
+        </div>
+        <div>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" name="startDate" required max="${T(java.time.LocalDate).now()}">
+        </div>
+        <div>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" name="endDate" required max="${T(java.time.LocalDate).now()}">
+        </div>
+        <div>
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    <!-- Display Error Message -->
+    <div th:if="${errorMessage}" style="color: red; margin-top: 20px;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <!-- Display Bills Table -->
+    <table th:if="${bills}" border="1" style="width: 100%; margin-top: 20px;">
+        <thead>
+            <tr>
+                <th>Bill ID</th>
+                <th>Patient Name</th>
+                <th>Total Amount</th>
+                <th>Bill Date</th>
+                <th>Total Paid</th>
+                <th>Remaining Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+			<tr th:each="bill : ${bills}">
+			    <td th:text="${bill.billId}"></td>
+			    <td th:text="${bill.patientName}"></td>
+			    <td th:text="${bill.totalAmount}"></td>
+			    <td th:text="${bill.billDate}"></td>
+			    <td th:text="${bill.totalPaid}"></td>
+			    <td th:text="${bill.remainingAmount}"></td>
+			    <td>
+			        <a th:href="@{/updateBill(billId=${bill.billId})}" class="btn btn-info">Update</a>
+			    </td>
+			</tr>
+        </tbody>
+    </table>
+
+    <!-- Go Back Button -->
+    <div style="text-align: center; margin-top: 40px;">
+        <button type="button" class="btn btn-dark" onclick="window.history.back();">Go Back</button>
+    </div>
+
+</body>
+</html>
