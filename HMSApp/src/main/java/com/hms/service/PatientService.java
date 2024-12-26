@@ -96,14 +96,14 @@ public class PatientService {
     // Optional: Fetch patient by ID (if needed for PATCH requests)
  
 
-    public List<Patient> getPatientsByDoctorAndDate(Long doctorId, LocalDate appDate) {
-        List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);
-        if (patients == null || patients.isEmpty()) {
-            // Optionally, log or throw a custom exception
-            return List.of(); // Return empty list if no patients found
-        }
-        return patients;
-    }
+    // public List<Patient> getPatientsByDoctorAndDate(int doctorId, LocalDate appDate) {
+    //     List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);
+    //     if (patients == null || patients.isEmpty()) {
+    //         // Optionally, log or throw a custom exception
+    //         return List.of(); // Return empty list if no patients found
+    //     }
+    //     return patients;
+    // }
 
 	public Patient updatePatientDetails(int id, Map<String, String> updates) {
 		// TODO Auto-generated method stub
@@ -133,7 +133,7 @@ public class PatientService {
             if (patient.getAppointmentList() != null && !patient.getAppointmentList().isEmpty()) {
                 // Check if the patient has any appointment within the last 2 years
                 boolean hasRecentAppointment = patient.getAppointmentList().stream()
-                        .anyMatch(appointment -> appointment.getAppDate().isAfter(twoYearsAgo));
+                        .anyMatch(appointment -> appointment.getAppointmentDate().isAfter(twoYearsAgo));
                 
                 // If there's any recent appointment, set status to "ACTIVE"
                 if (hasRecentAppointment) {
