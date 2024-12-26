@@ -55,6 +55,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	    List<Object[]> findUnpaidBills(@Param("patientId") String patientId,
 	                                    @Param("startDate") LocalDate startDate,
 	                                    @Param("endDate") LocalDate endDate);
+	    
+	    Bill findByAppointment_AppointmentId(int appointmentId); 
 
 
 }
