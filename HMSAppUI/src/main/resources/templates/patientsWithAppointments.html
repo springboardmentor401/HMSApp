@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Patients with Appointments Today</title>
+</head>
+<body>
+<h1>Patients with Appointments Today</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Patient ID</th>
+            <th>Patient Name</th>
+            <th>Appointment Date</th>
+            <th>Appointment Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="patient : ${patients}">
+            <td th:text="${patient.patientId}"></td>
+            <td th:text="${patient.patientName}"></td>
+            <!-- Assuming you are fetching the first appointment from the list of appointments -->
+            <td th:text="${patient.appointmentList[0].appointmentDate}"></td>
+            <td th:text="${patient.appointmentList[0].startTime}"></td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

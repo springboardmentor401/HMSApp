@@ -158,12 +158,12 @@ public class PaymentUIController {
         String billUrl = "http://localhost:7220/api/bills/" + billId;
         Bill bill = restTemplate.getForObject(billUrl, Bill.class);
 
-        if (bill == null || bill.getAppointment() == null || bill.getAppointment().getPatient() == null) {
+        if (bill == null || bill.getAppointment() == null || bill.getAppointment().getPatientObj() == null) {
             redirectAttributes.addFlashAttribute("error", "Bill or Patient information is missing!");
             return "redirect:/bills/pending";
         }
 
-        int patientId = bill.getAppointment().getPatient().getPatientId();
+        int patientId = bill.getAppointment().getPatientObj().getPatientId();
 
         if (paymentAmount > outstandingAmount) {
             redirectAttributes.addFlashAttribute("error", "Payment amount cannot exceed the outstanding amount.");

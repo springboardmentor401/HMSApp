@@ -7,6 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -21,38 +23,36 @@ import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hms.validation.ValidFutureDate;
+import com.hms.validation.ValidLocalTime;
 
 @Entity
 public class Appointment {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int appointmentId;
 
     @ManyToOne
     @JsonIgnoreProperties("appointmentList")
     @JoinColumn(name = "doctor_id", nullable = false)
-    @NotNull(message = "Doctor cannot be null")
     private Doctor doctorObj;
 
     @ManyToOne
     @JsonIgnoreProperties("appointmentList")
     @JoinColumn(name = "patient_id", nullable = false)
-    @NotNull(message = "Patient cannot be null")
     private Patient patientObj;
 
     @NotNull(message = "Appointment date cannot be empty")
     @FutureOrPresent(message = "Appointment date must be today or in the future")
-    @ValidFutureDate(message = "Appointment date cannot be more than 1 year in the future.")
+    @ValidFutureDate(message = "Appointment date cannot be more than 1 month in the future.")
      @JsonFormat(pattern = "dd-MM-yyyy")  
      private LocalDate appointmentDate;
-
+    
+    @ValidLocalTime
     @NotNull(message = "Start time cannot be null")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;
      
-     
-
-  
     private LocalTime endTime;
     
     @NotBlank(message = "Reason cannot be empty")
@@ -61,14 +61,13 @@ public class Appointment {
 
     private String doctorReport;
 
-    @Size(max = 255, message = "Suggested medicine cannot be longer than 255 characters")
+//    @Size(max = 255, message = "Suggested medicine cannot be longer than 255 characters")
     private String medicineSuggested;
 
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("appointment")
     private Bill billObj;
 
-    @NotBlank(message = "Status cannot be empty")
     @Pattern(regexp = "Scheduled|Completed|Cancelled", message = "Status must be one of 'Scheduled', 'Completed', or 'Cancelled'")
     private String status;
     
@@ -78,7 +77,7 @@ public class Appointment {
     public Appointment(Doctor doctorObj, Patient patientObj, LocalDate appointmentDate, LocalTime startTime) {
         this.doctorObj = doctorObj;
         this.patientObj = patientObj;
-        this.appointmentDate = appointmentDate;
+        this.appointmentDate =appointmentDate;
         this.startTime = startTime;
     }
 

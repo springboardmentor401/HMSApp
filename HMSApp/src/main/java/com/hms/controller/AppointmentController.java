@@ -2,12 +2,11 @@ package com.hms.controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,56 +29,61 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/appointments")
 public class AppointmentController {
+	
+	
 
+    @Autowired
+    private AppointmentService appointmentService;
+    
+    
+    @GetMapping("/{apid}")
+    public ResponseEntity<Appointment> getAppointmentById(@PathVariable int apid) throws InvalidEntityException {
+        Appointment appointment = appointmentService.getAppointmentById(apid);
+        if(appointment==null) {
+        	return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return new ResponseEntity<>(appointment, HttpStatus.OK);
+    }
+    @PostMapping("/bookAppointment/{doctorId}/{patientId}")
+    public ResponseEntity<?> createAppointment(@PathVariable("doctorId") int doctorId, 
+                                               @PathVariable("patientId") int patientId, 
+                                               @Valid @RequestBody Appointment appointment) throws InvalidEntityException {
+        
+        Appointment savedAppointment = appointmentService.saveAppointment(appointment, doctorId, patientId);
+            return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
+    }
+    @PutMapping("/reschedule/{appointmentId}")
+    public ResponseEntity<String> rescheduleAppointment(
+            @PathVariable int appointmentId,
+            @RequestParam LocalDate newDate,
+            @RequestParam LocalTime newTime) throws InvalidEntityException {
+        String response = appointmentService.rescheduleAppointment(appointmentId, newDate, newTime);
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/cancel/{appointmentId}")
+    public ResponseEntity<String> cancelAppointment(@PathVariable("appointmentId") int appointmentId)throws InvalidEntityException {
+        try {
+            appointmentService.cancelAppointment(appointmentId);
+            return ResponseEntity.ok("Appointment has been successfully cancelled.");   
+        }
+        catch (InvalidEntityException e) {
+            return ResponseEntity.status(404).body("Appointment not found.");
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body("An unexpected error occurred while processing your request.");
+        }
+    }
+    @GetMapping("/patientsWithAppointmentCurrentDay")
+    public ResponseEntity<List<Patient>> getPatientsWithAppointmentCurrentDay() {
+        LocalDate currentDate = LocalDate.now();
+        List<Patient> patients = appointmentService.getPatientsWithAppointmentsOnDate(currentDate);
+        
+        return ResponseEntity.ok(patients);
+    }
+    @GetMapping("/appointmentsForDate/{date}")
+    public List<Appointment> viewAppointmentsForDate(@PathVariable("date") String date) {
+        LocalDate requestedDate = LocalDate.parse(date); // Convert string date to LocalDate
+        return appointmentService.getAppointmentsForDate(requestedDate);
+    }
 
-
-	@Autowired
-	private AppointmentService appointmentService;
-
-	@Autowired
-	private DoctorRepository doctorRepository;
-
-	@Autowired
-	private PatientRepository patientRepository;
-
-	@GetMapping("/{apid}")
-	public ResponseEntity<Appointment> getAppointmentById(@PathVariable int apid) throws InvalidEntityException {
-		Appointment appointment = appointmentService.getAppointmentById(apid);
-
-		return new ResponseEntity<>(appointment, HttpStatus.OK);
-	}
-	@PostMapping("/bookAppointment/{doctorId}/{patientId}")
-	public ResponseEntity<?> createAppointment(@PathVariable("doctorId") int doctorId, 
-			@PathVariable("patientId") int patientId, 
-			@Valid @RequestBody Appointment appointment, 
-			BindingResult result) throws InvalidEntityException {
-		if (result.hasErrors()) {
-			StringBuilder errorMessages = new StringBuilder();
-			result.getAllErrors().forEach(error -> errorMessages.append(error.getDefaultMessage()).append("; "));
-			return new ResponseEntity<>(errorMessages.toString(), HttpStatus.BAD_REQUEST);
-		}
-		Doctor doctor = doctorRepository.findById(doctorId).orElseThrow(() -> new InvalidEntityException("Doctor not found"));
-		Patient patient = patientRepository.findById(patientId).orElseThrow(() -> new InvalidEntityException("Patient not found"));
-		appointment.setDoctorObj(doctor);
-		appointment.setPatientObj(patient);
-		Appointment savedAppointment = appointmentService.saveAppointment(appointment);
-		if (savedAppointment != null) {
-			return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
-		} else {
-			throw new InvalidEntityException("Error occurred while saving the appointment.");
-		}
-	}
-	@PutMapping("/reschedule/{appointmentId}")
-	public ResponseEntity<String> rescheduleAppointment(
-			@PathVariable int appointmentId,
-			@RequestParam LocalDate newDate,
-			@RequestParam LocalTime newTime) {
-		String response = appointmentService.rescheduleAppointment(appointmentId, newDate, newTime);
-		return ResponseEntity.ok(response);
-	}
-	@DeleteMapping("/cancel/{appointmentId}")
-	public ResponseEntity<String> cancelAppointment(@PathVariable int appointmentId) {
-		String response = appointmentService.cancelAppointment(appointmentId);
-		return ResponseEntity.ok(response);
-	}
 }

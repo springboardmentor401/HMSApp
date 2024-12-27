@@ -14,19 +14,13 @@ import com.hms.entities.Patient;
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
 	
 
-
+	@Query("SELECT a FROM Appointment a WHERE a.doctorObj.doctorId = :doctorId AND a.appointmentDate = :appointmentDate AND (a.startTime <= :endTime AND a.endTime >= :startTime)")
+	List<Appointment> findAppointmentsByDoctorAndTimeOverlap(int doctorId, LocalDate appointmentDate, LocalTime startTime, LocalTime endTime);
+	@Query("SELECT a.patientObj FROM Appointment a WHERE a.appointmentDate = :date")
+	List<Patient> findPatientsWithAppointmentsOnDate(LocalDate date);
 	List<Appointment> findByDoctorObj_DoctorId(Integer doctorId);
-	
-    @Query("SELECT a FROM Appointment a WHERE a.doctorObj.doctorId = :doctorId AND a.appointmentDate = :appointmentDate AND (a.startTime <= :endTime AND a.endTime >= :startTime)")
-    List<Appointment> findAppointmentsByDoctorAndTimeOverlap(int doctorId, LocalDate appointmentDate, LocalTime startTime, LocalTime endTime);
-    
-
-    @Query("SELECT a.patientObj FROM Appointment a WHERE a.doctorObj.doctorId = :doctorId AND a.appointmentDate = :appDate")
-    List<Patient> findPatientsByDoctorAndDate(@Param("doctorId") int doctorId, @Param("appDate") LocalDate appDate);
-    
-    @Query("SELECT a.patientObj FROM Appointment a WHERE a.status = 'pending'")
-    List<Patient> findPatientsWithpendingAppointments();
 	List<Appointment> findByStatus(String string);
-
+	 @Query("SELECT a.patientObj FROM Appointment a WHERE a.doctorObj.doctorId = :doctorId AND a.appointmentDate = :appDate")
+	 List<Patient> findPatientsByDoctorAndDate(@Param("doctorId") int doctorId, @Param("appDate") LocalDate appDate);
+	
 }
-

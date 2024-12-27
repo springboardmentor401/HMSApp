@@ -3,6 +3,7 @@ package com.hms.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,24 +27,18 @@ public class AppointmentService {
     @Autowired
     private PatientRepository patientRepository;
 
-    public Appointment saveAppointment(Appointment appointment) throws InvalidEntityException {
-        // Fetch doctor and patient from the repository using doctorId and patientId
-        Doctor doctor = doctorRepository.findById(appointment.getDoctorObj().getDoctorId())
-                .orElseThrow(() -> new InvalidEntityException("Doctor not found for ID: " + appointment.getDoctorObj().getDoctorId()));
+    public Appointment saveAppointment(Appointment appointment,int doctorId,int patientId) throws InvalidEntityException {
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new InvalidEntityException("Doctor not found with the ID " + doctorId));
 
-        Patient patient = patientRepository.findById(appointment.getPatientObj().getPatientId())
-                .orElseThrow(() -> new InvalidEntityException("Patient not found for ID: " + appointment.getPatientObj().getPatientId()));
-
-        // Set the Doctor and Patient objects to the appointment
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new InvalidEntityException("Patient not found with the ID " + patientId));
         appointment.setDoctorObj(doctor);
         appointment.setPatientObj(patient);
-
-        // Set other appointment details
         appointment.setAppointmentDate(appointment.getAppointmentDate());
         appointment.setStartTime(appointment.getStartTime());
         appointment.setReasonForVisit(appointment.getReasonForVisit());
 
-        // Calculate the end time by adding 1 hour to the start time
         appointment.calculateEndTime();
 
         // Check if there is any conflict with existing appointments
@@ -66,47 +61,59 @@ public class AppointmentService {
         );
         return !overlappingAppointments.isEmpty();
     }
-   
-    public String cancelAppointment(int appointmentId) {
+    
+    public String cancelAppointment(int appointmentId) throws InvalidEntityException{
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
-
-        if (appointment.getAppointmentDate().isAfter(LocalDate.now())) {
+                .orElseThrow(() -> new InvalidEntityException("Appointment not found"));
+        if (appointment.getAppointmentDate().isAfter(LocalDate.now()) || appointment.getAppointmentDate().isEqual(LocalDate.now())) {
             appointment.setStatus("Cancelled");
             appointmentRepository.save(appointment);
+
             return "Appointment cancelled successfully.";
         } else {
             return "Cannot cancel an appointment in the past.";
         }
     }
 
-
-    public String rescheduleAppointment(int appointmentId, LocalDate newDate, LocalTime newTime) {
+    public String rescheduleAppointment(int appointmentId, LocalDate newDate, LocalTime newTime) throws InvalidEntityException {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new InvalidEntityException("Appointment not found"));
 
-        if (!appointment.getStatus().equalsIgnoreCase("Scheduled")) {
-            return "Only scheduled appointments can be rescheduled.";
+        
+        if (appointment.getStatus().equalsIgnoreCase("Scheduled")) {
+            appointment.setAppointmentDate(newDate);
+            appointment.setStartTime(newTime);
+            appointment.calculateEndTime(); // Update the end time as well
+            
+            if (hasAppointmentConflict(appointment)) {
+                throw new InvalidEntityException("The doctor already has an appointment scheduled during the requested time.");
+            }
+
+            
+            appointmentRepository.save(appointment);
+            return "Appointment rescheduled successfully.";
+        } else {
+        	throw new InvalidEntityException("Only scheduled appointments can be rescheduled.");
         }
-
-        if (appointment.getAppointmentDate().isEqual(LocalDate.now())) {
-            return "Appointments cannot be rescheduled on the same day they were booked.";
-        }
-
-        // Update the new date and time
-        appointment.setAppointmentDate(newDate); // Set the new date
-        appointment.setStartTime(newTime);       // Set the new start time
-        appointment.calculateEndTime();         // Ensure the end time is updated
-        appointmentRepository.save(appointment);
-
-        return "Appointment rescheduled successfully.";
     }
-
-
    
     public Appointment getAppointmentById( int apid) throws InvalidEntityException {
         return appointmentRepository.findById(apid)
                 .orElseThrow(() -> new InvalidEntityException("Appointment with id " + apid + " not found"));
     }
-   
+    public void deleteAppointment(int id) {
+        appointmentRepository.deleteById(id);
+    }
+    public List<Patient> getPatientsWithAppointmentsOnDate(LocalDate date) {
+        return appointmentRepository.findPatientsWithAppointmentsOnDate(date);
+    }
+    public List<Appointment> getAppointmentsForDate(LocalDate date) {
+        List<Appointment> allAppointments = appointmentRepository.findAll();
+        return allAppointments.stream()
+                .filter(appointment -> appointment.getAppointmentDate().equals(date))
+                .collect(Collectors.toList());
+    }
+    
+    
+    
 }

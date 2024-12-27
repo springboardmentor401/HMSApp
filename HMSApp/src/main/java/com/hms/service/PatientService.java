@@ -113,8 +113,8 @@ public class PatientService {
     @Autowired
     private AppointmentRepository appointmentRepository;
 
-    public List<Patient> getPatientsByDoctorAndDate(int doctorId, LocalDate appDate) {
-        List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);
+    public List<Patient> getPatientsByDoctorAndDate(int doctorId, LocalDate appointmentDate) {
+        List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appointmentDate);
         if (patients == null || patients.isEmpty()) {
             // Optionally, log or throw a custom exception
             return List.of(); // Return empty list if no patients found
