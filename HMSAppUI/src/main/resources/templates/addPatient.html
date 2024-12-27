@@ -100,35 +100,35 @@
                     <div th:if="${#fields.hasErrors('emailId')}" th:errors="*{emailId}" class="error-message"></div>
                 </div>
 
-                <!-- Allergies -->
+                <!-- Allergies (Optional) -->
                 <div class="form-group">
                     <label for="allergies">Allergies:</label>
                     <input type="text" class="form-control" id="allergies" th:field="*{allergies}">
                     <div th:if="${#fields.hasErrors('allergies')}" th:errors="*{allergies}" class="error-message"></div>
                 </div>
 
-                <!-- Medications -->
+                <!-- Medications (Optional) -->
                 <div class="form-group">
                     <label for="medications">Medications:</label>
                     <input type="text" class="form-control" id="medications" th:field="*{medications}">
                     <div th:if="${#fields.hasErrors('medications')}" th:errors="*{medications}" class="error-message"></div>
                 </div>
 
-                <!-- Treatments -->
+                <!-- Treatments (Optional) -->
                 <div class="form-group">
                     <label for="treatments">Treatments:</label>
                     <input type="text" class="form-control" id="treatments" th:field="*{treatments}">
                     <div th:if="${#fields.hasErrors('treatments')}" th:errors="*{treatments}" class="error-message"></div>
                 </div>
 
-                <!-- Medical History -->
+                <!-- Medical History (Optional) -->
                 <div class="form-group">
                     <label for="medicalHistory">Medical History:</label>
                     <input type="text" class="form-control" id="medicalHistory" th:field="*{medicalHistory}">
                     <div th:if="${#fields.hasErrors('medicalHistory')}" th:errors="*{medicalHistory}" class="error-message"></div>
                 </div>
 
-                <!-- Others -->
+                <!-- Others (Optional) -->
                 <div class="form-group">
                     <label for="others">Others:</label>
                     <input type="text" class="form-control" id="others" th:field="*{others}">

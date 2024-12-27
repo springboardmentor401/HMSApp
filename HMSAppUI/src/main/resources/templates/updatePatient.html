@@ -135,38 +135,38 @@
                 <input type="email" id="emailId" th:field="*{emailId}" readonly />
             </div>
 
-            <!-- Location (Required) -->
+            <!-- Location (Editable and Required) -->
             <div class="form-group">
                 <label for="location">Location:</label>
                 <input type="text" id="location" th:field="*{location}" required />
                 <p th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="text-danger"></p>
             </div>
 
-            <!-- Allergies -->
+            <!-- Allergies (Editable) -->
             <div class="form-group">
                 <label for="allergies">Allergies:</label>
                 <input type="text" id="allergies" th:field="*{allergies}" />
             </div>
 
-            <!-- Medications -->
+            <!-- Medications (Editable) -->
             <div class="form-group">
                 <label for="medications">Medications:</label>
                 <input type="text" id="medications" th:field="*{medications}" />
             </div>
 
-            <!-- Treatments -->
+            <!-- Treatments (Editable) -->
             <div class="form-group">
                 <label for="treatments">Treatments:</label>
                 <input type="text" id="treatments" th:field="*{treatments}" />
             </div>
 
-            <!-- Medical History -->
+            <!-- Medical History (Editable) -->
             <div class="form-group">
                 <label for="medicalHistory">Medical History:</label>
                 <input type="text" id="medicalHistory" th:field="*{medicalHistory}" />
             </div>
 
-            <!-- Other Details -->
+            <!-- Other Details (Editable) -->
             <div class="form-group">
                 <label for="others">Other Details:</label>
                 <input type="text" id="others" th:field="*{others}" />

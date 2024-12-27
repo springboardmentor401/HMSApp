@@ -21,8 +21,19 @@ public class Patient {
     private String medications;
     private String emailId;
     private String location;
+    private String treatments;
+    private String medicalHistory;
+    private String others;
+    private String status;
+
+
 	
-    public int getPatientId() {
+
+	public String getStatus() {
+		return status;
+	}
+
+	public int getPatientId() {
 		return patientId;
 	}
 
@@ -132,11 +143,7 @@ public class Patient {
 		this.appointmentList = appointmentList;
 	}
 
-	private String treatments;
-    private String medicalHistory;
-    private String others;
-    private String status;
-
+	
     //@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Appointment> appointmentList;
 
