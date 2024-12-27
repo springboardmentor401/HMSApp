@@ -20,6 +20,16 @@
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
+		.button-container {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin: 20px 0; /* Optional: add some spacing around the buttons */
+		}
+
+		.btn {
+		    padding: 10px 20px; /* Optional: adjust button size */
+		}
 
         h1 {
             text-align: center;
@@ -167,10 +177,14 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
+			<div class="button-container">
+			    <!-- Go Back Button -->
+			    <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Go Back</button>
 
-        <!-- Print Button -->
-        <button class="btn btn-primary" onclick="window.print()">Print Bill</button>
-    </div>
+			    <!-- Print Button -->
+			    <button class="btn btn-primary" onclick="window.print()">Print Bill</button>
+			</div>
+
+
 </body>
 </html>

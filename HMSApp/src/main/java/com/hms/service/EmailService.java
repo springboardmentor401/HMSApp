@@ -100,5 +100,18 @@ public class EmailService {
                       "\n\nPlease review the updated patient information in the system.";
         sendEmail(patientEmail, subject, text);
     }
+
+
+    //for doctorapp
+
+//        public void sendEmail(String to, String subject, String text) {
+//            SimpleMailMessage message = new SimpleMailMessage();
+//            message.setTo(to);
+//            message.setSubject(subject);
+//            message.setText(text);
+//            mailSender.send(message);
+//        }
+
+
 }
 

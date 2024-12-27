@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,18 +31,17 @@ import com.hms.entities.Bill;
 
 
 @Controller
-public class BillUIController {
+public class BillUIController{
 
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String BASE_URL = "http://localhost:7220"; // Base URL for the backend API
+    private final String BASE_URL = "http://localhost:7211"; // Base URL for the backend API
 
-    @GetMapping("/bill") // Renders the home page
+    @GetMapping("/") // Renders the home page
     public String home() {
-        return "l"; // This will render home.html
+        return "dashboardBill"; // This will render home.html
     }
-    
 
     @GetMapping("/addBillForm") // Renders the add bill page
     public String showAddBillPage(Model model) {
@@ -120,60 +120,6 @@ public class BillUIController {
         return "billAdd";
     }
 
-    @GetMapping("/paidbills/{patientId}")
-    public String getPaidBillHistory(@PathVariable String patientId,  
-                                     @RequestParam(required = false) LocalDate startDate, 
-                                     @RequestParam(required = false) LocalDate endDate, 
-                                     Model model) {
-        // Construct the base URL for fetching paid bills
-        String url = BASE_URL + "/api/bills/paidbills";
-
-        // Create query parameters list
-        List<String> queryParams = new ArrayList<>();
-        queryParams.add("patientId=" + patientId); // Adding patientId as a required query parameter
-
-        // Add startDate and endDate to query parameters if provided
-        if (startDate != null) {
-            queryParams.add("startDate=" + startDate);
-        }
-        if (endDate != null) {
-            queryParams.add("endDate=" + endDate);
-        }
-
-        // Construct the full URL with query parameters
-        if (!queryParams.isEmpty()) {
-            url += "?" + String.join("&", queryParams);
-        }
-
-        System.out.println("Request URL: " + url); // Debugging log
-
-        try {
-            // Fetch the paid bills from the backend service
-            ResponseEntity<List<Bill>> response = restTemplate.exchange(
-                url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Bill>>() {}
-            );
-
-            List<Bill> paidBills = response.getBody();
-            System.out.println("Fetched Paid Bills: " + paidBills); // Debugging log
-
-            // Add paid bills to the model if they exist
-            if (paidBills != null && !paidBills.isEmpty()) {
-                model.addAttribute("paidBills", paidBills);
-            } else {
-                model.addAttribute("errorMessage", "No paid bills found for the given criteria.");
-            }
-        } catch (HttpClientErrorException e) {
-            // Handle HTTP client errors (e.g., 404, 400)
-            String errorMessage = "Error fetching paid bills: " + e.getMessage();
-            model.addAttribute("errorMessage", errorMessage);
-        } catch (Exception e) {
-            // Handle unexpected errors (e.g., network issues)
-            model.addAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
-        }
-
-        return "paidBillHistory"; // Render the "paidBillHistory.html" template
-    }
-
 
     @GetMapping("/viewBills")
     public String viewBills(@RequestParam(required = false) Integer billId,
@@ -226,8 +172,46 @@ public class BillUIController {
 
         return "viewAllBill"; // This will render the "viewAllBill.html" template
     }
+    @GetMapping("/paid")
+    public String showPaidBillsPage(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            Model model) {
 
-   
+        // Check if future date is selected
+        if (startDate != null && startDate.isAfter(LocalDate.now()) || endDate != null && endDate.isAfter(LocalDate.now())) {
+            model.addAttribute("error", "Date can't be in the future");
+            return "paidBills";
+        }
+
+        // Construct URL for backend request
+        StringBuilder urlBuilder = new StringBuilder("http://localhost:7211/api/bills/paid");
+
+        // Append query parameters only if present
+        if (startDate != null && endDate != null) {
+            urlBuilder.append("?startDate=").append(startDate).append("&endDate=").append(endDate);
+        }
+
+        // Call backend and fetch bills
+        Bill[] billsArray = restTemplate.getForObject(urlBuilder.toString(), Bill[].class);
+
+        // Handle response
+        List<Bill> paidBills = (billsArray != null) ? Arrays.asList(billsArray) : new ArrayList<>();
+        model.addAttribute("paidBills", paidBills);
+
+        // Add date range to model
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+
+        // If no bills found, display a message
+        if (paidBills.isEmpty()) {
+            model.addAttribute("error", "No bills found for the given date range.");
+        }
+
+        return "paidBills"; // Template in resources/templates/paidBills.html
+    }
+
+
 
     @GetMapping("/searchBill")
     public String searchBill(@RequestParam("billId") Long billId, Model model) {
@@ -335,7 +319,114 @@ public class BillUIController {
         }
     }
 
+    @GetMapping("/paidbills/{patientId}")
+    public String getPaidBillHistory(@PathVariable String patientId,  
+                                     @RequestParam(required = false) LocalDate startDate, 
+                                     @RequestParam(required = false) LocalDate endDate, 
+                                     Model model) {
+        // Construct the base URL for fetching paid bills
+        String url = BASE_URL + "/api/bills/paidbills";
 
+        // Create query parameters list
+        List<String> queryParams = new ArrayList<>();
+        queryParams.add("patientId=" + patientId); // Adding patientId as a required query parameter
 
+        // Add startDate and endDate to query parameters if provided
+        if (startDate != null) {
+            queryParams.add("startDate=" + startDate);
+        }
+        if (endDate != null) {
+            queryParams.add("endDate=" + endDate);
+        }
 
+        // Construct the full URL with query parameters
+        if (!queryParams.isEmpty()) {
+            url += "?" + String.join("&", queryParams);
+        }
+
+        System.out.println("Request URL: " + url); // Debugging log
+
+        try {
+            // Fetch the paid bills from the backend service
+            ResponseEntity<List<Bill>> response = restTemplate.exchange(
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<List<Bill>>() {}
+            );
+
+            List<Bill> paidBills = response.getBody();
+            System.out.println("Fetched Paid Bills: " + paidBills); // Debugging log
+
+            // Add paid bills to the model if they exist
+            if (paidBills != null && !paidBills.isEmpty()) {
+                model.addAttribute("paidBills", paidBills);
+            } else {
+                model.addAttribute("errorMessage", "No paid bills found for the given criteria.");
+            }
+        } catch (HttpClientErrorException e) {
+            // Handle HTTP client errors (e.g., 404, 400)
+            String errorMessage = "Error fetching paid bills: " + e.getMessage();
+            model.addAttribute("errorMessage", errorMessage);
+        } catch (Exception e) {
+            // Handle unexpected errors (e.g., network issues)
+            model.addAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
+        }
+
+        return "paidBillHistory"; // Render the "paidBillHistory.html" template
+    }
+    
+   
+
+        @GetMapping("/patients/pending")
+        public String viewUnpaidBills(@RequestParam(required = false) String patientId,
+                                      @RequestParam(required = false) LocalDate startDate,
+                                      @RequestParam(required = false) LocalDate endDate,
+                                      Model model) {
+
+            // Construct URL with query parameters
+            String apiUrl = BASE_URL +"/api/bills/patients/pending"; // Preserve original BASE_URL
+            System.out.println(apiUrl);
+            List<String> queryParams = new ArrayList<>();
+            if (patientId != null) {
+                queryParams.add("patientId=" + patientId);
+            }
+            if (startDate != null && endDate != null) {
+                queryParams.add("startDate=" + startDate);
+                queryParams.add("endDate=" + endDate);
+            }
+
+            if (!queryParams.isEmpty()) {
+                apiUrl += "?" + String.join("&", queryParams);
+            }
+
+            try {
+                // Call REST API to fetch unpaid bills
+                ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    apiUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+                );
+
+                List<Map<String, Object>> bills = response.getBody();
+                if (bills != null && !bills.isEmpty()) {
+                    model.addAttribute("bills", bills);
+                } else {
+                    model.addAttribute("errorMessage", "No unpaid bills found with the provided criteria.");
+                }
+            } catch (HttpClientErrorException e) {
+                // Handle HTTP errors
+                String errorMessage = "Error fetching bills: " + e.getStatusCode();
+                model.addAttribute("errorMessage", errorMessage);
+            } catch (Exception e) {
+                // Handle unexpected errors
+                model.addAttribute("errorMessage", "An unexpected error occurred: " + e.getMessage());
+            }
+
+            return "viewUnpaidBills"; // Render Thymeleaf template
+        }
+    
+
+    
+   
 }
+
+
+
+
+

@@ -72,7 +72,7 @@
                         <th>Description</th>
                         <th>Discount Percentage</th>
                         <th>Taxes</th>
-                        <th>Action</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -89,9 +89,7 @@
                         <td th:text="${bill.description}"></td>
                         <td th:text="${bill.discountPercentage}"></td>
                         <td th:text="${bill.taxes}"></td>
-                        <td>
-                            <a th:href="@{/updateBill(billId=${bill.billId})}" class="btn btn-info">Update</a>
-                        </td>
+                        
                     </tr>
                 </tbody>
             </table>
@@ -104,5 +102,10 @@
             </div>
         </div>
     </div>
+	<!-- Go Back Button -->
+	<div style="text-align: center; margin-bottom: 20px;">
+	    <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Go Back</button>
+	</div>
+
 </body>
 </html>
