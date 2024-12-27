@@ -41,7 +41,7 @@ public class PatientService {
         Patient newPatient = patientRepository.save(patient);
 
         // Notify patient via email
-        sendEmailNotification(
+        emailService.sendEmail(
                 patient.getEmailId(), // Assuming you have 'emailId' in Patient entity
                 "Patient Registration Successful",
                 "Dear " + patient.getPatientName() + ",\n\n" +
@@ -53,11 +53,6 @@ public class PatientService {
 
         return newPatient;
     }
-
-    private void sendEmailNotification(String email, String subject, String text) {
-       // emailService.sendEmail(email, subject, text);  // Call the sendEmail method in EmailService
-    }
-
 
 
 	// View all patients
@@ -89,8 +84,11 @@ public class PatientService {
 
     public Patient updatePatient(Patient patient) {
         Patient updatedPatient = patientRepository.save(patient);
-        // Send email when a patient is updated
-        emailService.notifyPatientUpdated(updatedPatient.getEmailId(), updatedPatient.getPatientName());
+       
+        String subject = "Patient Updated: " + patient.getPatientName();
+        String text = "Dear Team,\n\nThe details of the patient have been updated.\n\nPatient Name: " + patient.getPatientName() +
+                      "\n\nPlease review the updated patient information in the system.";
+        emailService.sendEmail(patient.getEmailId(), subject, text);
         return updatedPatient;
     }
     // Optional: Fetch patient by ID (if needed for PATCH requests)
@@ -154,7 +152,7 @@ public class PatientService {
     public void scheduledDeactivation() {
         deactivateInactivePatients();  // Call the deactivateInactivePatients method to check and update patient status
     }
-    @Autowired
+    
 
     public List<Patient> getPatientsWithNoShowAppointments() {
         // Find all appointments with status "Pending"

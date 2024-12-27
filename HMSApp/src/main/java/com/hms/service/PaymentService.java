@@ -63,7 +63,7 @@ public class PaymentService {
                     "Payment Method: " + savedPayment.getPaymentMethod() + "\n\n" +
                     "Regards,\nCare and Cure Hospital";
 
-            emailService.sendPaymentConfirmation(patient.getEmailId(), "Payment Confirmation", emailBody);
+            emailService.sendEmail(patient.getEmailId(), "Payment Confirmation", emailBody);
         }
     }
 

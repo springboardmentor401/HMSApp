@@ -30,13 +30,13 @@ public class DoctorUIController {
 
     private final RestTemplate restTemplate;
 
-    @Value("${api.base-url}")
-    private String baseUrl;
+   
+    private String baseUrl="http://localhost:7220";
 
     public DoctorUIController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-    @GetMapping("/")
+    @GetMapping("/doctorHome")
     public String homePage() {
         return "home"; // This should map to a 'home.html' in the templates folder
     }

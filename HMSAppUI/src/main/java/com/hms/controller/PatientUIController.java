@@ -208,18 +208,17 @@ public class PatientUIController {
             model.addAttribute("patients", response.getBody());
             return "viewPatientsByDoctorAndDate";
         } catch (Exception e) {
-<<<<<<< HEAD
+
             model.addAttribute("error", 
                     "No patients found for doctorId: " + doctorId + " on date: " + appDate + ". Error: " + e.getMessage());
             return "viewPatientsByDoctorAndDateForm";
         }
-=======
-            model.addAttribute("error", "No patients found for doctorId: " + doctorId + " on date: " + appDate);
-            return "viewPatientsByDoctorAndDateForm";
+
+          
         }
         //return "viewPatientsByDoctorAndDate";
->>>>>>> 73a85836a603c69b334930638c5f6830cfafbc95
-    }
+
+
 
 
     @GetMapping("/no-show-patients")

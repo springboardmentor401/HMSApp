@@ -77,7 +77,7 @@ public class EmailService {
             System.out.println("Error sending email with attachment: " + e.getMessage());
         }
     }
-    public void sendPaymentConfirmation(String toEmail, String subject, String body) {
+  /*  public void sendPaymentConfirmation(String toEmail, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("21b01a0581@svecw.edu.in");
         message.setTo(toEmail);
@@ -99,7 +99,7 @@ public class EmailService {
         String text = "Dear Team,\n\nThe details of the patient have been updated.\n\nPatient Name: " + patientName +
                       "\n\nPlease review the updated patient information in the system.";
         sendEmail(patientEmail, subject, text);
-    }
+    }*/
 
 
     //for doctorapp

@@ -36,11 +36,11 @@ public class BillUIController{
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String BASE_URL = "http://localhost:7211"; // Base URL for the backend API
+    private final String BASE_URL = "http://localhost:7220"; // Base URL for the backend API
 
-    @GetMapping("/") // Renders the home page
+    @GetMapping("/billHome") // Renders the home page
     public String home() {
-        return "dashboardBill"; // This will render home.html
+        return "dashboard"; // This will render home.html
     }
 
     @GetMapping("/addBillForm") // Renders the add bill page
@@ -52,7 +52,7 @@ public class BillUIController{
     @GetMapping("/patient/{patientId}/pending")
     public String getPendingBills(@PathVariable String patientId, Model model) {
        
-          String url = "http://localhost:7211/api/bills/patient/" + patientId + "/pending"; // Replace with actual backend URL
+          String url = "http://localhost:7220/api/bills/patient/" + patientId + "/pending"; // Replace with actual backend URL
            Bill[] billsArray = restTemplate.getForObject(url, Bill[].class);
            List<Bill>  pendingBills   = Arrays.asList(billsArray);
         model.addAttribute("pendingBills", pendingBills);
@@ -185,7 +185,7 @@ public class BillUIController{
         }
 
         // Construct URL for backend request
-        StringBuilder urlBuilder = new StringBuilder("http://localhost:7211/api/bills/paid");
+        StringBuilder urlBuilder = new StringBuilder("http://localhost:7220/api/bills/paid");
 
         // Append query parameters only if present
         if (startDate != null && endDate != null) {

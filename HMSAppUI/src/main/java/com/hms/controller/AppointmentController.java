@@ -35,7 +35,7 @@ public class AppointmentController {
     
     private static final String BASE_URL = "http://localhost:7220"; // URL of the backend API
     
-    @GetMapping("/")
+    @GetMapping("/AppointmentHome")
     public String home(Model model) {
         return "homeappointment";
     }
