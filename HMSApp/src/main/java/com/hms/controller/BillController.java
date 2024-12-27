@@ -39,7 +39,6 @@ public class BillController {
                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return billService.getPaidBillsByPatient(patientId, startDate, endDate);
     }
-
     
     @PostMapping("/generateBill/{appointmentId}")
     public ResponseEntity<Object> generateBill(
@@ -91,8 +90,40 @@ public class BillController {
     public List<Bill> getPendingBills(@PathVariable String patientId) {
         return billService.getPendingBillsForPatient(patientId);
     }
+    
+    @GetMapping("/paid")
+    public ResponseEntity<List<Bill>> getPaidBillsByPeriod(
+            @RequestParam(name = "startDate", required = false) 
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) 
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
+        // Set default date range if dates are not provided
+        if (startDate == null) {
+            startDate = LocalDate.now().minusMonths(1); // Default to last month
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now(); // Default to today
+        }
 
+        // Optional: Validate date range
+        if (startDate.isAfter(endDate)) {
+            return ResponseEntity.badRequest().body(null); // Return 400 if the date range is invalid
+        }
+
+        List<Bill> paidBills = billService.getPaidBillsByPeriod(startDate, endDate);
+
+        // If no bills found, return a 204 No Content response
+        if (paidBills.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // Return a 200 OK response with the list of paid bills
+        return ResponseEntity.ok(paidBills);
+    }
+   
+
+    
     // Get a specific bill by ID
     @GetMapping("/viewBill/{billId}")
     public ResponseEntity<Bill> viewBill(@PathVariable int billId) throws InvalidEntityException {
@@ -105,6 +136,7 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+  
     @PutMapping("/updateMedicineFees/{billId}/{medicineFees}")
     public ResponseEntity<Object> updateMedicineFees(@PathVariable int billId, @PathVariable double medicineFees) throws InvalidEntityException {
         try {
@@ -173,21 +205,49 @@ public class BillController {
     public ResponseEntity<Bill> updateBill(@PathVariable("billId") Integer billId, @RequestBody Bill bill) throws InvalidEntityException {
         // Find the existing bill by ID
         Bill existingBill = billService.getBillById(billId);
-        
+
         if (existingBill == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        
-        // Update the bill fields (you can modify this part as needed)
-        existingBill.setDescription(bill.getDescription());
+
+        // Update the bill fields from the request body
+        existingBill.setDescription(bill.getDescription()); // Keep description unchanged
         existingBill.setConsultationFees(bill.getConsultationFees());
         existingBill.setMedicineFees(bill.getMedicineFees());
         existingBill.setTestCharge(bill.getTestCharge());
 
+        // Apply discount if the medicine fees exceed 1000
+        if (existingBill.getMedicineFees() > 1000) {
+            existingBill.setDiscountPercentage(10.0f); // Set discount to 10% if medicine fees exceed 1000
+        }
+
+        // Recalculate the total amount after applying the discount
+        double totalAmount = billService.calculateTotalAmountt(
+           
+            existingBill // Pass the updated bill object
+        );
+        existingBill.setTotalAmount(totalAmount); // Update the total amount
+
         // Save the updated bill
         Bill updatedBill = billService.updateBill(existingBill);
-        
+
         return ResponseEntity.ok(updatedBill);
+    }
+
+	//unpaidall patient
+    @GetMapping("/patients/pending")
+    public ResponseEntity<List<Map<String, Object>>> getUnpaidBills(
+        @RequestParam(required = false) String patientId,
+        @RequestParam(required = false) LocalDate startDate,
+        @RequestParam(required = false) LocalDate endDate
+    ) {
+        List<Map<String, Object>> unpaidBills = billService.getUnpaidBills(patientId, startDate, endDate);
+
+        if (!unpaidBills.isEmpty()) {
+            return ResponseEntity.ok(unpaidBills);
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
     }
 
 

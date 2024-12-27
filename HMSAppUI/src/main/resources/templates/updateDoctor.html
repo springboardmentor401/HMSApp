@@ -118,9 +118,6 @@
     <label for="consultationFees">Consultation Fees:</label>
     <input type="number" th:field="*{consultationFees}" step="0.01" />
 
-    <label for="dateOfJoining">Date of Joining:</label>
-    <input type="date" th:field="*{dateOfJoining}" />
-
     <label for="Surgeon">Is Surgeon?</label>
     <input type="checkbox" th:field="*{Surgeon}" />
 
@@ -136,6 +133,9 @@
 <div class="message" th:if="${error}">
     <p th:text="${error}" class="error"></p>
 </div>
+<div class="navigation">
+	<a th:href="@{/homedoctor}" class="back-home">Back to Home</a>
+			 </div>
 
 </body>
 </html>
