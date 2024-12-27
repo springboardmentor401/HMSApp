@@ -1,4 +1,4 @@
-package com.hms.entities;
+ package com.hms.entities;
 
 import java.time.LocalDate;
 
@@ -15,28 +15,25 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@Entity
+@Entity 
 @Table(name = "doctor")
 public class Doctor {
 
-    @Id
+    @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int doctorId;
 
     @NotBlank(message = "Doctor name cannot be blank")
     @Size(min = 2, max = 100, message = "Doctor name must be between 2 and 100 characters")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Doctor name must contain only alphabets and spaces")
-    @Column
+    @Column(name = "doctor_name", nullable = false, length = 255)
     private String doctorName;
 
     @NotBlank(message = "Specialization cannot be blank")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Specialization must contain only alphabets and spaces")
     @Column
     private String specialization;
 
     @NotBlank(message = "Qualification cannot be blank")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Qualification must contain only alphabets and spaces")
     @Column
     private String qualification;
 
@@ -56,12 +53,11 @@ public class Doctor {
     private String gender;
 
     @NotBlank(message = "Location cannot be blank")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Location must contain only alphabets and spaces")
     @Column
     private String location;
 
     @NotNull(message = "Consultation fees cannot be null")
-    @Min(value = 0, message = "Consultation fees must be a positive number")
+    @Min(value = 0, message = "Consultation fees must be greater than or equal to 0")
     @Column
     private double consultationFees;
 
@@ -71,34 +67,36 @@ public class Doctor {
 
     @NotNull(message = "Surgeon status cannot be null")
     @Column
-    private boolean Surgeon;
+    private boolean isSurgeon;
 
     @NotNull(message = "Years of experience cannot be null")
     @Min(value = 0, message = "Years of experience must be greater than or equal to 0")
     @Column
     private int yearsOfExperience;
 
+    @NotNull(message = "Status cannot be null")
     @Column
-    private boolean status=true;
+    private boolean status;
 
     // Getters and setters
 
-    public int getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(int doctorId) {
-        this.doctorId = doctorId;
-    }
+    
 
     public String getDoctorName() {
         return doctorName;
     }
 
-    public void setDoctorName(String doctorName) {
+    public Long getDoctorId() {
+		return doctorId;
+	}
+
+	public void setDoctorId(Long doctorId) {
+		this.doctorId = doctorId;
+	}
+
+	public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
     }
-
     public String getSpecialization() {
         return specialization;
     }
@@ -164,11 +162,11 @@ public class Doctor {
     }
 
     public boolean isSurgeon() {
-        return Surgeon;
+        return isSurgeon;
     }
 
-    public void setSurgeon(boolean Surgeon) {
-        this.Surgeon = Surgeon;
+    public void setSurgeon(boolean isSurgeon) {
+        this.isSurgeon = isSurgeon;
     }
 
     public int getYearsOfExperience() {
@@ -179,19 +177,11 @@ public class Doctor {
         this.yearsOfExperience = yearsOfExperience;
     }
 
-	public void setId(int id) {
-		// TODO Auto-generated method stub
-		
-	}
-	public boolean isstatus() {
-	    return status;
-	}
+    public boolean isStatus() {
+        return status;
+    }
 
-	public void setstatus(boolean status) {
-		this.status = status; 
-		
-	}
-
-	
-	}
-
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+}

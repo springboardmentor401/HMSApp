@@ -12,6 +12,8 @@ import com.hms.entities.Appointment;
 import com.hms.entities.Bill;
 
 public interface BillRepository extends JpaRepository<Bill, Integer> {
+	
+	 Bill findByAppointment_AppointmentId(int appointmentId); 
 	 Optional<Bill> findByAppointment(Appointment appointment);
 	 @Query("SELECT b, SUM(IFNULL(p.amountPaid, 0)) AS totalPaid " +
 		       "FROM Bill b LEFT JOIN b.pmtList p " +
@@ -21,15 +23,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 		List<Object[]> findBillsWithPendingPaymentsByPatientId(@Param("patientId") String patientId);
 		
 		
-	    List<Bill> findByBillDateBetween(LocalDate startDate, LocalDate endDate); 
+	    List<Bill> findByBillDateBetween(LocalDate startDate, LocalDate endDate);  
 	    
-	    
-	    @Query("SELECT DISTINCT b FROM Bill b JOIN b.pmtList p " +
-	    	       "WHERE p.paymentStatus = 'Paid' " +
-	    	       "AND p.paymentDate BETWEEN :startDate AND :endDate")
-	    	List<Bill> findPaidBillsByPeriod(@Param("startDate") LocalDate startDate,
-	    	                                 @Param("endDate") LocalDate endDate);
-	    //billhistoryfor pateint
 	    @Query("SELECT DISTINCT b FROM Bill b " +
 	    	       "JOIN b.pmtList p " +
 	    	       "JOIN b.appointment a " +
@@ -40,23 +35,4 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	    	List<Bill> findPaidBillsByPatientAndDateRange(@Param("patientId") String patientId, 
 	    	                                              @Param("startDate") LocalDate startDate, 
 	    	                                              @Param("endDate") LocalDate endDate);
-	    
-	    //billunpaidfor all patient
-	    @Query("SELECT b, p.patientName, b.totalAmount, b.billDate, SUM(COALESCE(pay.amountPaid, 0)) AS totalPaid " +
-	            "FROM Bill b " +
-	            "JOIN b.appointment a " +
-	            "JOIN a.patientObj p " +
-	            "LEFT JOIN b.pmtList pay " +
-	            "WHERE (:patientId IS NULL OR p.patientId = :patientId) " +
-	            "AND (:startDate IS NULL OR b.billDate >= :startDate) " +
-	            "AND (:endDate IS NULL OR b.billDate <= :endDate) " +
-	            "GROUP BY b.billId, p.patientName, b.totalAmount, b.billDate " +
-	            "HAVING SUM(COALESCE(pay.amountPaid, 0)) < b.totalAmount")
-	    List<Object[]> findUnpaidBills(@Param("patientId") String patientId,
-	                                    @Param("startDate") LocalDate startDate,
-	                                    @Param("endDate") LocalDate endDate);
-	    
-	    Bill findByAppointment_AppointmentId(int appointmentId); 
-
-
 }

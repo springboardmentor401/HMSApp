@@ -125,23 +125,20 @@
             <!-- Card 4: View All Bills -->
             <div class="card">
                 <div class="card-title">View All Bills</div>
-                <a th:href="@{/viewBills}" class="card-link">View All Bills</a>
+                <a th:href="@{/viewBills}" class="card-link">View All</a>
             </div>
-			<div class="card">
-			                <div class="card-title">View Paid bills</div>
-							<a th:href="@{/paid}">View Paid Bills</a>
-			            </div>
-			
+
+            <!-- Card 5: View Unpaid Bills -->
             <div class="card">
-                <div class="card-title">View Unpaid Billspatient</div>
+                <div class="card-title">View Unpaid Bills</div>
                 <a th:href="@{/patient/{patientId}/pending(patientId=201)}" class="card-link">View Unpaid</a>
             </div>
         </div>
         <div class="cards">
             <!-- Card 6: View Paid Bills -->
             <div class="card">
-                <div class="card-title">View UnpaidBill</div>
-                <a th:href="@{/patients/pending}" class="card-link">View Paid</a>
+                <div class="card-title">View Paid Bills</div>
+                <a th:href="@{/paidbills/{patientId}(patientId=201)}" class="card-link">View Paid</a>
             </div>
 
             <!-- Card 7: Generate Bill -->

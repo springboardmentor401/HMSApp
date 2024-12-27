@@ -83,65 +83,24 @@
 </form>
 
 <div th:if="${doctor != null}" class="doctor-details">
-	<h3>Doctor Details:</h3>
-	<table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-	    <tr>
-	        <th style="text-align: left;">Name</th>
-	        <td><span th:text="${doctor.doctorName}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Specialization</th>
-	        <td><span th:text="${doctor.specialization}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Qualification</th>
-	        <td><span th:text="${doctor.qualification}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Contact Number</th>
-	        <td><span th:text="${doctor.contactNumber}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Email</th>
-	        <td><span th:text="${doctor.emailId}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Gender</th>
-	        <td><span th:text="${doctor.gender}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Location</th>
-	        <td><span th:text="${doctor.location}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Consultation Fees</th>
-	        <td><span th:text="${doctor.consultationFees}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Date of Joining</th>
-	        <td><span th:text="${doctor.dateOfJoining}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Is Surgeon</th>
-	        <td><span th:text="${doctor.surgeon ? 'Yes' : 'No'}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Years of Experience</th>
-	        <td><span th:text="${doctor.yearsOfExperience}"></span></td>
-	    </tr>
-	    <tr>
-	        <th style="text-align: left;">Status</th>
-	        <td><span th:text="${doctor.status ? 'Active' : 'Inactive'}"></span></td>
-	    </tr>
-	</table>
+    <h3>Doctor Details:</h3>
+    <p>Name: <span th:text="${doctor.doctorName}"></span></p>
+    <p>Specialization: <span th:text="${doctor.specialization}"></span></p>
+    <p>Qualification: <span th:text="${doctor.qualification}"></span></p>
+    <p>Contact Number: <span th:text="${doctor.contactNumber}"></span></p>
+    <p>Email: <span th:text="${doctor.emailId}"></span></p>
+    <p>Gender: <span th:text="${doctor.gender}"></span></p>
+    <p>Location: <span th:text="${doctor.location}"></span></p>
+    <p>Consultation Fees: <span th:text="${doctor.consultationFees}"></span></p>
+    <p>Date of Joining: <span th:text="${doctor.dateOfJoining}"></span></p>
+    <p>Is Surgeon: <span th:text="${doctor.surgeon ? 'Yes' : 'No'}"></span></p>
+    <p>Years of Experience: <span th:text="${doctor.yearsOfExperience}"></span></p>
+    <p>Status: <span th:text="${doctor.status ? 'Active' : 'Inactive'}"></span></p>
 </div>
 
 <div th:if="${errorMessage}" class="error-message">
     <p th:text="${errorMessage}"></p>
 </div>
-<div class="navigation">
-	<a th:href="@{/homedoctor}" class="back-home">Back to Home</a>
-        </div>
 
 </body>
 </html>

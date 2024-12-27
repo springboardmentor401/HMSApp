@@ -226,7 +226,100 @@ public class PaymentUIController {
     
     
     
-  
+  /*  
+
+    @GetMapping("/register")
+    public String showRegisterPage() {
+        return "registration";  // Shows registration page
+    }
+    
+ // Register new user
+    
+    @PostMapping("/registerUser")
+    public String registerUser(@ModelAttribute User newUser, Model model) {
+    	try {
+    	    // Log user details for debugging
+    	    System.out.println("Received registration request: " + newUser);
+
+    	    // Send POST request to backend and expect a String response
+    	    ResponseEntity<String> response = restTemplate.exchange(
+    	        "http://localhost:7220/api/users/register", HttpMethod.POST,
+    	        new HttpEntity<>(newUser), String.class);
+
+    	    // Handle the string response from the backend
+    	    if (response.getStatusCode() == HttpStatus.OK) {  // Corrected to HttpStatus.OK
+    	        model.addAttribute("message", response.getBody()); // Display success message
+    	        return "login";  // Registration successful, redirect to login page
+    	    } else {
+    	        model.addAttribute("error", response.getBody()); // Display error message
+    	        return "registration"; // Show the registration page again
+    	    }
+    	} catch (Exception e) {
+    	    e.printStackTrace();
+    	    model.addAttribute("error", "An error occurred during registration. Please try again.");
+    	    return "registration";  // Show the registration page with an error message
+    	}
+
+    }
+
+
+    @GetMapping("/login/")
+    public String showLoginPage() {
+        return "login";  // Shows login page
+    }
+    
+ // Login user
+    @PostMapping("/login")
+    public String loginUser(@RequestParam String username, 
+                            @RequestParam String password, 
+                            Model model, 
+                            HttpSession session) {
+        try {
+            // Check user credentials
+            String url = "http://localhost:7220/api/users/login?username=" + username + "&password=" + password;
+            ResponseEntity<User> response = restTemplate.exchange(url, HttpMethod.GET, null, User.class);
+
+            User user = response.getBody();
+            if (user != null) {
+                // Store user information in session
+                session.setAttribute("user", user);
+
+                // Redirect user based on their role
+                if ("ADMIN".equals(user.getRole())) {
+                    return "redirect:/admin/home";  // Admin dashboard
+                } else {
+                    return "redirect:/user/payments";   // User profile page
+                }
+            } else {
+                model.addAttribute("error", "Invalid username or password.");
+                return "login";  // Stay on login page if credentials are incorrect
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "An error occurred while logging in. Please try again.");
+            return "login";
+        }
+    }
+*/
+/*
+    @GetMapping("/users")
+    public String showUsersPage(Model model) {
+        try {
+            // Fetch all users from the backend API
+            ResponseEntity<List<User>> response = restTemplate.exchange(
+                "http://localhost:7220/api/users",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<User>>() {}
+            );
+            List<User> users = response.getBody();
+            model.addAttribute("users", users);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to fetch users. Please try again.");
+            e.printStackTrace();
+        }
+        return "users";  // Shows the users list for admin
+    }*/
+
     // ******************** ADMIN PROFILE ********************
 
     // ADMIN Profile - View all payments with filtering

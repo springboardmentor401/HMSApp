@@ -5,11 +5,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import jakarta.persistence.ManyToOne;
 
 public class Appointment {
 
+	@ManyToOne
 	
 	private Doctor doctor;
+	@ManyToOne
 	private Patient patient;
 	private int appointmentId;
 	private LocalDate appDate;
