@@ -196,18 +196,31 @@ public class PatientUIController {
     }
 
     @GetMapping("/viewPatientsByDoctorAndDate")
-    public String viewPatientsByDoctorAndDate(@RequestParam int doctorId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appDate, Model model) {
+    public String viewPatientsByDoctorAndDate(
+            @RequestParam(name = "doctorId") int doctorId,
+            @RequestParam(name = "appDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appDate,
+            Model model) {
         try {
             ResponseEntity<List> response = restTemplate.getForEntity(
-                BASE_URL + "/api/patient/by-doctor-and-date?doctorId=" + doctorId + "&appDate=" + appDate, List.class);
+                    BASE_URL + "/api/patient/by-doctor-and-date?doctorId=" + doctorId + "&appDate=" + appDate, 
+                    List.class);
+
             model.addAttribute("patients", response.getBody());
             return "viewPatientsByDoctorAndDate";
         } catch (Exception e) {
+<<<<<<< HEAD
+            model.addAttribute("error", 
+                    "No patients found for doctorId: " + doctorId + " on date: " + appDate + ". Error: " + e.getMessage());
+            return "viewPatientsByDoctorAndDateForm";
+        }
+=======
             model.addAttribute("error", "No patients found for doctorId: " + doctorId + " on date: " + appDate);
             return "viewPatientsByDoctorAndDateForm";
         }
         //return "viewPatientsByDoctorAndDate";
+>>>>>>> 73a85836a603c69b334930638c5f6830cfafbc95
     }
+
 
     @GetMapping("/no-show-patients")
     public String getNoShowPatients(Model model) {
