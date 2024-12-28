@@ -42,7 +42,7 @@ public class AppointmentController {
     
     
     public List<Doctor> getDocList(){
-    	String backendUrl = BASE_URL + "/doctors";
+    	String backendUrl = BASE_URL + "/doctors/getAll";
         ResponseEntity<List<Doctor>> response = restTemplate.exchange(
                 backendUrl, 
                 HttpMethod.GET, 

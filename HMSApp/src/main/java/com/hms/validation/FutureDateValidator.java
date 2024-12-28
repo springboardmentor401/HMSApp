@@ -11,12 +11,12 @@ public class FutureDateValidator implements ConstraintValidator<ValidFutureDate,
     }
 
     @Override
-    public boolean isValid(LocalDate appDate, ConstraintValidatorContext context) {
-        if (appDate == null) {
+    public boolean isValid(LocalDate appointmentDate, ConstraintValidatorContext context) {
+        if (appointmentDate == null) {
             return true;
         }
         LocalDate today = LocalDate.now();
-        LocalDate maxFutureDate = today.plusYears(1);
-        return !appDate.isAfter(maxFutureDate);
+        LocalDate oneMonthFromToday = today.plusMonths(1);
+        return !appointmentDate.isAfter(oneMonthFromToday);
     }
 }
