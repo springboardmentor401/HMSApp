@@ -107,7 +107,7 @@ public class PatientController {
    
    
     @PutMapping("/updatePatient/{id}")
-    public ResponseEntity<?> updatePatient(@PathVariable("Id") int id, @RequestBody @Valid Patient updatedPatient, BindingResult result) {
+    public ResponseEntity<?> updatePatient(@PathVariable("id") int id, @RequestBody @Valid Patient updatedPatient, BindingResult result) {
         // Handle validation errors
     	
         if (result.hasErrors()) {
