@@ -148,11 +148,10 @@ public class PatientService {
     }
 
     // Scheduled task that runs every day at midnight (you can adjust the cron expression as needed)
-    @Scheduled(cron = "0 0 0 * * ?")  // Runs daily at midnight
+    @Scheduled(cron = "0 0 8 * * ?") // Runs daily at 8:00 AM
     public void scheduledDeactivation() {
-        deactivateInactivePatients();  // Call the deactivateInactivePatients method to check and update patient status
+        deactivateInactivePatients(); // Call the method to check and update patient status
     }
-    
 
     public List<Patient> getPatientsWithNoShowAppointments() {
         // Find all appointments with status "Pending"
@@ -170,11 +169,9 @@ public class PatientService {
 
     
     
-//I have a doctor class ,patient and an appointment class  I want to send a mail notificationto the  the patient   email id one day prior  to the appointement how to do that
     
 
 
-    //I have an application spring data jpa and springrest .Whenever i add the entity to the database it need to send an email notification to that entity email id
 	
 
 
