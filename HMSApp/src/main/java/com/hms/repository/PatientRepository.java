@@ -12,7 +12,8 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
     // Query to fetch medical history
 	@Query("SELECT p FROM Patient p WHERE p.medicalHistory LIKE %:medicalHistory%")
-    List<Patient> findByMedicalHistory(String medicalHistory);
+	List<Patient> findByMedicalHistory(@Param("medicalHistory") String medicalHistory);
+    List<Patient> findByMedicalHistoryContaining(String medicalHistory);
 
     // Query to fetch treatments
     
@@ -20,6 +21,8 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
 	@Query("SELECT p FROM Patient p LEFT JOIN FETCH p.appointmentList")
     List<Patient> findAllWithAppointments();
+	
+	Patient findByUserUserName(String userName);
 	
 }
    

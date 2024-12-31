@@ -19,6 +19,8 @@ import com.hms.repository.AppointmentRepository;
 import com.hms.repository.PatientRepository;
 import com.hms.entities.Appointment;
 import com.hms.entities.Patient;
+import com.hms.entities.UserInfo;
+import com.hms.exception.InvalidEntityException;
 
 import org.springframework.stereotype.Service;
 
@@ -36,8 +38,22 @@ public class PatientService {
     @Autowired
     private EmailService emailService; // Autowired instance of EmailService
 
-    public Patient addPatient(Patient patient) {
+    @Autowired
+    UserService userService;
+
+    
+    public Patient getPatientByUserName(String username) {
+        return patientRepository.findByUserUserName(username);
+    }
+
+    public Patient addPatient(Patient patient) throws InvalidEntityException {
         patient.setStatus("Active");
+
+        String temp = patient.getContactNumber().substring(6);//patient.getContactNumber().length()-4);
+        UserInfo u = new UserInfo(patient.getPatientName().substring(0,4)+temp, "test", "patient");
+        patient.setUser(u);
+        userService.addUser(u);        
+    	
         Patient newPatient = patientRepository.save(patient);
 
         // Notify patient via email
@@ -45,7 +61,8 @@ public class PatientService {
                 patient.getEmailId(), // Assuming you have 'emailId' in Patient entity
                 "Patient Registration Successful",
                 "Dear " + patient.getPatientName() + ",\n\n" +
-                        "You have been successfully registered in our system.\n" +
+                        "You have been successfully registered in our system.\nYour id is " +patient.getPatientId()+
+                        "your username and password are "+patient.getUser().getUserName()+", "+patient.getUser().getPassword()+"."+                    
                         "Thank you for choosing our services.\n\n" +
                         "Best Regards,\n"
                         + "Hospital Management Team"
@@ -148,10 +165,11 @@ public class PatientService {
     }
 
     // Scheduled task that runs every day at midnight (you can adjust the cron expression as needed)
-    @Scheduled(cron = "0 0 8 * * ?") // Runs daily at 8:00 AM
+    @Scheduled(cron = "0 0 0 * * ?")  // Runs daily at midnight
     public void scheduledDeactivation() {
-        deactivateInactivePatients(); // Call the method to check and update patient status
+        deactivateInactivePatients();  // Call the deactivateInactivePatients method to check and update patient status
     }
+    
 
     public List<Patient> getPatientsWithNoShowAppointments() {
         // Find all appointments with status "Pending"
@@ -169,9 +187,11 @@ public class PatientService {
 
     
     
+//I have a doctor class ,patient and an appointment class  I want to send a mail notificationto the  the patient   email id one day prior  to the appointement how to do that
     
 
 
+    //I have an application spring data jpa and springrest .Whenever i add the entity to the database it need to send an email notification to that entity email id
 	
 
 

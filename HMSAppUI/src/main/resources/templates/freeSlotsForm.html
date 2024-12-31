@@ -120,7 +120,13 @@
 
     <div class="error" th:if="${error != null}">
         <p th:text="${error}"></p>
+        
     </div>
+    <div class="navigation">
+				<a th:href="${role == 'admin' ? '/admin' : '/patient'}" class="back-home">Back to Home</a>
+	
+		 </div>
+
 </body>
 </html>
 

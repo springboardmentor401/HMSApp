@@ -175,10 +175,13 @@
             <!-- Submit Button -->
             <button type="submit">Update Patient</button>
         </form>
-
+		</div>
         <!-- Back Button -->
-        <a href="/" class="back-link">Back to Home</a>
-    </div>
+		<div class="navigation">
+							<a th:href="${role == 'admin' ? '/admin/patientinfo' : '/patient/patientinfo'}" class="back-home">Back to Home</a>
+								 </div>
+    
+	
 </body>
 
 </html>

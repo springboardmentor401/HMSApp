@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hms.entities.Doctor;
 import com.hms.entities.Patient;
 
 @Controller
@@ -37,8 +39,45 @@ public class PatientUIController {
     private RestTemplate restTemplate;
 
     private final String BASE_URL = "http://localhost:7220";
+    
+    
+    Doctor docSession=null;
 
-    @GetMapping("/")
+    Patient patSession=null;
+   
+    String role = "admin";
+    
+    @ModelAttribute
+    public void getDoc(@SessionAttribute(name = "docObj", required = false) Doctor docObj) {
+    	if (docObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+docObj+"  "+docObj.getDoctorId());
+	    	docSession = docObj;
+	    	//role="doctor";
+	    	
+    	}    	
+    }
+    
+    @ModelAttribute
+    public void getPatient(@SessionAttribute(name = "patObj", required = false) Patient patObj) {
+    	if (patObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
+	    	patSession = patObj;
+	    	//role="patient";
+    	}    	
+    }
+
+    @ModelAttribute
+    public void getRole(@SessionAttribute(name = "role", required = false) String userRole) {
+    	if (userRole != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+role);
+	    	role = userRole;
+	    	
+    	}    	
+    }
+
+    
+
+    @GetMapping("/patienthome")
     public String home() {
         return "home";
     }
@@ -83,7 +122,10 @@ public class PatientUIController {
     }
 
     @GetMapping("/viewPatientByIdForm")
-    public String viewPatientByIdForm() {
+    public String viewPatientByIdForm(Model model) {
+    	 model.addAttribute("role",role);
+     	System.out.println("in form "+role);
+    	
         return "viewPatientByIdForm";
     }
 
@@ -94,6 +136,10 @@ public class PatientUIController {
                 BASE_URL + "/api/patient/viewPatientById/" + patientId,
                 Patient.class
             );
+           
+        	model.addAttribute("role",role);
+        	System.out.println("in form "+role);
+
             model.addAttribute("patient", response.getBody());
             return "viewPatientById";
             
@@ -107,7 +153,10 @@ public class PatientUIController {
     }
 
     @GetMapping("/viewPatientByNameForm")
-    public String viewPatientByNameForm() {
+    public String viewPatientByNameForm(Model model) {
+    	 model.addAttribute("role",role);
+     	System.out.println("in form "+role);
+    	
         return "viewPatientByNameForm";
     }
 
@@ -115,10 +164,14 @@ public class PatientUIController {
     public String viewPatientByName(@RequestParam("name") String name, Model model) {
         try {
             ResponseEntity<List> response = restTemplate.getForEntity(BASE_URL + "/api/patient/viewPatientByName/" + name, List.class);
+            model.addAttribute("role",role);
+        	System.out.println("in form "+role);
             model.addAttribute("patients", response.getBody());
             return "viewPatientByName";
         } catch (Exception e) {
             model.addAttribute("error", "No patients found with the name: " + name);
+            model.addAttribute("role",role);
+        	System.out.println("in form "+role);
             return "viewPatientByNameForm";
         }
         //return "viewPatientByName";
@@ -126,6 +179,9 @@ public class PatientUIController {
 
     @GetMapping("/updatePatientForm")
     public String updatePatientForm(Model model) {
+    	model.addAttribute("role",role);
+    	System.out.println("in form "+role);
+    	
         model.addAttribute("patient", new Patient());
         return "updatePatientForm";
     }
@@ -137,6 +193,9 @@ public class PatientUIController {
                 BASE_URL + "/api/patient/viewPatientById/" + patientId,
                 Patient.class
             );
+            model.addAttribute("role",role);
+        	System.out.println("in form "+role);
+        	
             model.addAttribute("patient", response.getBody());
             return "updatePatient";
         } catch (Exception e) {

@@ -123,8 +123,8 @@
     <p th:text="${error}"></p>
 </div>
 <div class="navigation">
-	<a th:href="@{/homedoctor}" class="back-home">Back to Home</a>
-			 </div>
+	<a th:href="${role == 'admin' ? '/admin' : '/patient'}" class="back-home">Back to Home</a>
+		 </div>
 
 </body>
 </html>

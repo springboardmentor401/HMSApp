@@ -15,9 +15,9 @@ public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 
 	void deleteById(int id);
 
-	Optional<Doctor> findById(int id);
+	//Optional<Doctor> findById(int id);
 
-	boolean existsById(int id);
+	//boolean existsById(int id);
 	
 	List<Doctor> findBySpecialization(String specialization);
 
@@ -26,5 +26,9 @@ public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
                                                       @Param("appointmentDate") LocalDate appointmentDate);
 
 	List<Doctor> findBySpecializationAndStatusTrue(String specialization);
+	
+	Doctor findByUserUserName(String userName);
+	
+	
 }
 

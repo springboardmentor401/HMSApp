@@ -2,6 +2,7 @@ package com.hms.service;
 
 import com.hms.entities.Appointment;
 import com.hms.entities.Doctor;
+import com.hms.entities.UserInfo;
 import com.hms.exception.InvalidEntityException;
 import com.hms.repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,17 @@ public class DoctorService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    UserService userService;
+
     // Add a new doctor
-    public Doctor addDoctor(Doctor doctor) {
+    public Doctor addDoctor(Doctor doctor) throws InvalidEntityException {
+    	
+    	String temp = doctor.getContactNumber().substring(6);//doctor.getContactNumber().length()-4);
+        UserInfo u = new UserInfo(doctor.getDoctorName().substring(0,4)+temp, "test", "doctor");
+        doctor.setUser(u);
+        userService.addUser(u);        
+    	
         Doctor savedDoctor = doctorRepository.save(doctor);
         
         // Send email notification
@@ -107,10 +117,13 @@ public class DoctorService {
         	    doctor.getEmailId(),        // Email
         	    doctor.getLocation()        // Location
         	);
+        if(action.equals("added")) {
+        	emailContent += "Your user name is "+doctor.getUser().getUserName()+" and password is "+doctor.getUser().getPassword()+".";
+        }
 
 
         try {
-            emailService.sendEmail("bhavadharanim2500@gmail.com", subject, emailContent); // Replace with actual admin email
+            emailService.sendEmail(doctor.getEmailId(), subject, emailContent); // Replace with actual admin email
         } catch (Exception e) {
             System.err.println("Error sending email: " + e.getMessage());
         }
@@ -152,4 +165,9 @@ public class DoctorService {
 
         return freeSlots;
     }
+    
+    public Doctor getDoctorByUserName(String username) {
+    	return doctorRepository.findByUserUserName(username);
+    }
+
 }

@@ -70,9 +70,9 @@
             </table>
         </div>
 
-        <!-- Back Buttons -->
-        <a href="/viewPatientByIdForm" class="btn btn-secondary">Back to Search</a>
-        <a href="/" class="btn btn-primary">Back to Home</a>
+		<div class="navigation">
+					<a th:href="${role == 'admin' ? '/admin/patientinfo' : '/patient'}" class="back-home">Back to Home</a>
+						 </div>
     </div>
 </body>
 </html>

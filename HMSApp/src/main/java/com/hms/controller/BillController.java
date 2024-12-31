@@ -3,6 +3,7 @@ package com.hms.controller;
 import com.hms.entities.Appointment;
 import com.hms.entities.Bill;
 import com.hms.exception.InvalidEntityException;
+import com.hms.repository.BillRepository;
 import com.hms.service.BillService;
 import com.hms.service.EmailService;
 
@@ -33,13 +34,66 @@ public class BillController {
 
     @Autowired
     private BillService billService;
+    @Autowired
+    private BillRepository billrepo;
     @GetMapping("/paidbills")
     public List<Bill> getPaidBills(@RequestParam String patientId,
                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return billService.getPaidBillsByPatient(patientId, startDate, endDate);
     }
+    @GetMapping("/{billId}")
+    public ResponseEntity<?> getBillById(@PathVariable int billId) {
+        try {
+            // Fetch the bill details
+            Bill bill = billService.getBillById(billId);
+            
+            if (bill != null) {
+                // Return HTTP 200 (OK) with the bill details
+                return ResponseEntity.ok(bill);
+            } else {
+                // Return HTTP 404 (Not Found) if the bill is not found
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of(
+                                "message", "Bill not found",
+                                "billId", billId
+                        ));
+            }
+        } catch (Exception ex) {
+            // Log the exception and return HTTP 500 (Internal Server Error)
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "message", "An error occurred while fetching the bill details",
+                            "error", ex.getMessage()
+                    ));
+        }
+    }
     
+    @PutMapping("/{id}")
+    public ResponseEntity<Bill> updateBill(@PathVariable int id, @RequestBody Bill bill) {
+        // Check if the bill with the given id exists
+        Optional<Bill> existingBillOptional = billrepo.findById(id);
+        
+        if (!existingBillOptional.isPresent()) {
+            // If the bill is not found, return a Not Found (404) response
+            return ResponseEntity.notFound().build();
+        }
+
+        Bill existingBill = existingBillOptional.get();
+
+        // Update the properties of the existing bill
+        existingBill.setTotalAmount(bill.getTotalAmount());
+        existingBill.setStatus(bill.getStatus());
+     
+        // Add any other fields you need to update
+
+        // Save the updated bill
+        Bill updatedBill = billrepo.save(existingBill);
+
+        // Return the updated bill with a 200 OK response
+        return ResponseEntity.ok(updatedBill);
+    }
     @PostMapping("/generateBill/{appointmentId}")
     public ResponseEntity<Object> generateBill(
             @Valid @RequestBody Bill bill,

@@ -2,6 +2,7 @@ package com.hms.controller;
 
 import com.hms.entities.Doctor;
 import com.hms.exception.InvalidEntityException;
+import com.hms.repository.DoctorRepository;
 import com.hms.service.DoctorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,15 @@ public class DoctorController {
 
     // Add a new doctor
     @PostMapping("/addDoctor")
-    public ResponseEntity<?> addDoctor(@Valid @RequestBody Doctor doctor) {
-        
-        
-            doctorService.addDoctor(doctor);
-            return new ResponseEntity<>("Doctor added successfully!", HttpStatus.CREATED);
+    public ResponseEntity<?> addDoctor(@Valid @RequestBody Doctor doctor) throws InvalidEntityException {
+            
+        doctorService.addDoctor(doctor);
+        return new ResponseEntity<>("Doctor added successfully!", HttpStatus.CREATED);
     }
-    
+    @GetMapping("/fetchByUserName/{userName}")
+    public ResponseEntity<Doctor> viewDoctorByUserName(@PathVariable("userName") String userName) {
+    	return new ResponseEntity<>(doctorService.getDoctorByUserName(userName),HttpStatus.OK);
+    }
 
     // Get all doctors
     @GetMapping("/getAll")
@@ -107,5 +110,5 @@ public class DoctorController {
         List<String> freeSlots = doctorService.getDoctorFreeSlots(doctorId, appointmentDate, start, end);
         return ResponseEntity.ok(freeSlots);
     }
-
+    
 }

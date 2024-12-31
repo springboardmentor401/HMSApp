@@ -99,7 +99,8 @@
 </head>
 <body>
     <div class="view-history">
-        <a th:href="@{/paidbills/{patientId}(patientId=203)}">View Past Bill History</a>
+		<a th:href="@{/paidbills/{patientId}(patientId=${patientId})}">Paid Bills</a>
+
     </div>
 
     <h1>Pending Bills</h1>
@@ -119,19 +120,20 @@
                 <td th:text="${bill.totalAmount}"></td>
                 <td th:text="${bill.totalPaid}"></td>
                 <td th:text="${bill.totalAmount - bill.totalPaid}"></td>
-                <td>
-                    <a th:href="@{/make-payment(billId=${bill.billId})}" 
-                       th:if="${bill.totalAmount - bill.totalPaid > 0}">
-                        Make Payment
-                    </a>
-                </td>
+                
+					<td>
+					    <a th:href="@{/make-payment(billId=${bill.billId}, totalAmount=${bill.totalAmount}, totalPaid=${bill.totalPaid}, outstandingAmount=${bill.totalAmount - bill.totalPaid})}" 
+					       th:if="${bill.totalAmount - bill.totalPaid > 0}">
+					        Make Payment
+					    </a>
+					</td>
+
+               
             </tr>
         </tbody>
     </table>
  <!-- Go Back Button -->
-<div style="text-align: center; margin-bottom: 40px;">
-	<button type="button" class="btn btn-secondary" onclick="window.location.href='/patient/{patientId}/pending(patientId=201)'">Go Back</button>
-</div>
 
+ <a href="/patient/billinfo" >Back to Home</a>
 </body>
 </html>

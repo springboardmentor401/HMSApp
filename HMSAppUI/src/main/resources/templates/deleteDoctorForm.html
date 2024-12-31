@@ -68,6 +68,12 @@
             margin: 10px 0;
             font-size: 14px;
         }
+        
+        .navigation {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-bottom: 2px solid #007bff;
+        }
 
       
     </style>
@@ -90,8 +96,9 @@
         <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
     </div>
 	<div class="navigation">
-		<a th:href="@{/homedoctor}" class="back-home">Back to Home</a>
+				            <a th:href="@{/admin}" class="back-home">Back to Home</a>
 				 </div>
+
 </body>
 </html>
 

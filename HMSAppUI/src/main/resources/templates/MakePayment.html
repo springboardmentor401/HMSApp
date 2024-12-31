@@ -114,6 +114,7 @@
 
             <button type="submit">Submit Payment</button>
         </form>
+		
 		<div class="container">
 		    <!-- Display success message -->
 		    <div class="success" th:if="${message}" style="color: green; font-weight: bold; margin-bottom: 1rem;">
@@ -122,6 +123,7 @@
 
 		    <!-- Existing form content -->
 		</div>
+		<a href="/patient/pending" class="btn btn-primary btn-back">Back to Home</a>
 		<!-- Modal Trigger -->
 		<div id="paymentSuccessModal" style="display: none;">
 		    <div style="

@@ -2,27 +2,44 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Patients with Appointments Today</title>
+    <style>
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <h1>Patients with Appointments Today</h1>
-<table border="1">
-    <thead>
-        <tr>
-            <th>Patient ID</th>
-            <th>Patient Name</th>
-            <th>Appointment Date</th>
-            <th>Appointment Time</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr th:each="patient : ${patients}">
-            <td th:text="${patient.patientId}"></td>
-            <td th:text="${patient.patientName}"></td>
-            <!-- Assuming you are fetching the first appointment from the list of appointments -->
-            <td th:text="${patient.appointmentList[0].appointmentDate}"></td>
-            <td th:text="${patient.appointmentList[0].startTime}"></td>
-        </tr>
-    </tbody>
-</table>
+
+<!-- Error Message -->
+<p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
+
+<!-- Table Content -->
+<div th:if="${patients != null && patients.size() > 0}">
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Patient ID</th>
+                <th>Patient Name</th>
+                <th>Appointment Date</th>
+                <th>Appointment Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="patient : ${patients}">
+                <td th:text="${patient.patientId}"></td>
+                <td th:text="${patient.patientName}"></td>
+                <!-- Assuming you are fetching the first appointment from the list of appointments -->
+                <td th:text="${patient.appointmentList[0].appointmentDate}"></td>
+                <td th:text="${patient.appointmentList[0].startTime}"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<a href="/admin/appointmentinfo" class="btn btn-secondary mt-3">Back to Home</a>
 </body>
 </html>

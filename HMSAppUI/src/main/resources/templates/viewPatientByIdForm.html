@@ -21,9 +21,9 @@
             </div>
             <button type="submit" class="btn btn-primary">View Patient</button>
         </form>
-
-        <!-- Back to Home Button -->
-        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+		<div class="navigation">
+			<a th:href="${role == 'admin' ? '/admin' : '/patient'}" class="back-home">Back to Home</a>
+				 </div>
     </div>
 </body>
 </html>

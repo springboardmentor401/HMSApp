@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,6 +29,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hms.entities.Bill;
+import com.hms.entities.Doctor;
+import com.hms.entities.Patient;
 
 
 @Controller
@@ -37,6 +40,31 @@ public class BillUIController{
     private RestTemplate restTemplate;
 
     private final String BASE_URL = "http://localhost:7220"; // Base URL for the backend API
+
+    
+    Patient patSession=null;
+    //    Patient patSession;
+
+    String role = "admin";
+    
+    
+    @ModelAttribute
+    public void getPatient(@SessionAttribute(name = "patObj", required = false) Patient patObj) {
+    	if (patObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
+	    	patSession = patObj;
+	    	//role="patient";
+    	}    	
+    }
+
+    @ModelAttribute
+    public void getRole(@SessionAttribute(name = "role", required = false) String userRole) {
+    	if (userRole != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+role);
+	    	role = userRole;
+	    	
+    	}    	
+    }
 
     @GetMapping("/billHome") // Renders the home page
     public String home() {
@@ -49,15 +77,44 @@ public class BillUIController{
       
         return "billAdd"; // This will render billAdd.html
     }
-    @GetMapping("/patient/{patientId}/pending")
-    public String getPendingBills(@PathVariable String patientId, Model model) {
+   /* @GetMapping("/patient/{patientId}/pending")
+    public String getPendingBills(@PathVariable(value = "patientId", required = false) Integer patientId, Model model) {
+       if(patientId==null) {
+    	   patientId=patSession.getPatientId();
+       }
        
           String url = "http://localhost:7220/api/bills/patient/" + patientId + "/pending"; // Replace with actual backend URL
            Bill[] billsArray = restTemplate.getForObject(url, Bill[].class);
            List<Bill>  pendingBills   = Arrays.asList(billsArray);
         model.addAttribute("pendingBills", pendingBills);
         return "Patient";
+    }*/
+    
+    @GetMapping("/patient/pending")
+    public String getPendingBills(Model model) {
+        // Use `patientId` from session if available
+        Integer patientId = (patSession != null) ? patSession.getPatientId() : null;
+        System.out.println("jwalkdjwkajdcriu hiu hrfwi e.k");
+        System.out.println(patientId);
+
+        if (patientId == null) {
+            // Handle case when patientId is not available
+            model.addAttribute("error", "Patient ID is not available. Please log in.");
+            return "redirect:/loginPage"; // Redirect to login page
+        }
+
+        // Fetch pending bills from the backend
+        String url = "http://localhost:7220/api/bills/patient/" + patientId + "/pending";
+        System.out.println(url);
+        Bill[] billsArray = restTemplate.getForObject(url, Bill[].class);
+        List<Bill> pendingBills = Arrays.asList(billsArray);
+
+        // Add bills to the model
+        model.addAttribute("patientId", patientId);
+        model.addAttribute("pendingBills", pendingBills);
+        return "Patient"; // Return patient page view
     }
+
 
     @PostMapping("/addBill/{appointmentId}")
     public String addBill(@PathVariable("appointmentId") Long appointmentId,
@@ -326,6 +383,7 @@ public class BillUIController{
                                      Model model) {
         // Construct the base URL for fetching paid bills
         String url = BASE_URL + "/api/bills/paidbills";
+        System.out.println("jkshjkkoooo");
 
         // Create query parameters list
         List<String> queryParams = new ArrayList<>();

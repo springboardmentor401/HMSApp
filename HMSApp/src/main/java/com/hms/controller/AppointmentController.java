@@ -74,7 +74,7 @@ public class AppointmentController {
         }
     }
     @GetMapping("/patientsWithAppointmentCurrentDay")
-    public ResponseEntity<List<Patient>> getPatientsWithAppointmentCurrentDay() {
+    public ResponseEntity<List<Patient>> getPatientsWithAppointmentCurrentDay() throws InvalidEntityException {
         LocalDate currentDate = LocalDate.now();
         List<Patient> patients = appointmentService.getPatientsWithAppointmentsOnDate(currentDate);
         

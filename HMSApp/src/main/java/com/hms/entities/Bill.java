@@ -104,7 +104,16 @@ public class Bill {
      this.totalPaid = totalPaid;
  }
    
-  
+	 public void setStatus(String string) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public String getStatus() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	   
     
     public Bill() {}
 

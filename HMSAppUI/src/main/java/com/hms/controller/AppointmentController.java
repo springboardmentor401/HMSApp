@@ -33,7 +33,43 @@ public class AppointmentController {
     @Autowired
     private RestTemplate restTemplate;
     
+    
     private static final String BASE_URL = "http://localhost:7220"; // URL of the backend API
+
+    Doctor docSession=null;
+
+    Patient patSession=null;
+   
+    String role = "admin";
+    
+    @ModelAttribute
+    public void getDoc(@SessionAttribute(name = "docObj", required = false) Doctor docObj) {
+    	if (docObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+docObj+"  "+docObj.getDoctorId());
+	    	docSession = docObj;
+	    	//role="doctor";
+	    	
+    	}    	
+    }
+    
+    @ModelAttribute
+    public void getPatient(@SessionAttribute(name = "patObj", required = false) Patient patObj) {
+    	if (patObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
+	    	patSession = patObj;
+	    	//role="patient";
+    	}    	
+    }
+
+    @ModelAttribute
+    public void getRole(@SessionAttribute(name = "role", required = false) String userRole) {
+    	if (userRole != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+role);
+	    	role = userRole;
+	    	
+    	}    	
+    }
+
     
     @GetMapping("/AppointmentHome")
     public String home(Model model) {
@@ -280,11 +316,21 @@ public class AppointmentController {
             );
             List<Patient> patients = response.getBody();
             model.addAttribute("patients", patients);
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "Error fetching patients: " + e.getMessage());
         }
-        
+        catch (HttpClientErrorException | HttpServerErrorException e) {
+            // Handle 404 error specifically
+        	Map<String, String> errors=null;;
+			try {
+				errors = new ObjectMapper().readValue(
+				    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {});
+			
+				// Map backend error message to Model
+				model.addAttribute("errorMessage", errors.get("message")); //mapname.get(key) ->value
+			}catch (Exception e1) {
+            e1.printStackTrace();
+            model.addAttribute("errorMessage", "Error fetching patients: " + e1.getMessage());
+        }
+        }
         return "patientsWithAppointments"; 
     }
     @GetMapping("/viewAppointmentsForCurrentDate")

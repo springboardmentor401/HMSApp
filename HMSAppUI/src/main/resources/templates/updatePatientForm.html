@@ -7,14 +7,17 @@
 </head>
 <body>
     <h2>Fetch Patient by ID</h2>
-
+	
     <!-- Form to fetch patient details by ID -->
     <form th:action="@{/fetchPatientForUpdate}" method="post">
         <label for="patientId">Patient ID:</label>
         <input  id="patientId" name="patientId" required />
         <button type="submit">Fetch Patient</button>
     </form>
-
+	<div class="navigation">
+						<a th:href="${role == 'admin' ? '/admin/patientinfo' : '/patient/patientinfo'}" class="back-home">Back to Home</a>
+							 </div>
+	
     <div th:if="${error}">
         <p style="color: red;">[[${error}]]</p>
     </div>

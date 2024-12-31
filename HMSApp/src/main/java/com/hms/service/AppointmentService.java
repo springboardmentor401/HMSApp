@@ -104,8 +104,13 @@ public class AppointmentService {
     public void deleteAppointment(int id) {
         appointmentRepository.deleteById(id);
     }
-    public List<Patient> getPatientsWithAppointmentsOnDate(LocalDate date) {
-        return appointmentRepository.findPatientsWithAppointmentsOnDate(date);
+    public List<Patient> getPatientsWithAppointmentsOnDate(LocalDate date) throws InvalidEntityException {
+    	List<Patient>patients=appointmentRepository.findPatientsWithAppointmentsOnDate(date);
+    	if(patients==null || patients.isEmpty())
+        {
+        	throw new InvalidEntityException("No Appointment for current day");
+        }
+        return patients;
     }
     public List<Appointment> getAppointmentsForDate(LocalDate date) {
         List<Appointment> allAppointments = appointmentRepository.findAll();

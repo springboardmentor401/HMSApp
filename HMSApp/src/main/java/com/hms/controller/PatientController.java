@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hms.entities.Patient;
+import com.hms.exception.InvalidEntityException;
 import com.hms.service.PatientService;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -37,14 +38,18 @@ public class PatientController {
 
     // Add a new patient with validation and error handling
     @PostMapping("/addPatient")
-    public ResponseEntity<?> addPatient(@Valid @RequestBody Patient patient) {
+    public ResponseEntity<?> addPatient(@Valid @RequestBody Patient patient) throws InvalidEntityException {
        
 
          
             Patient savedPatient = service.addPatient(patient);
             return new ResponseEntity<>(savedPatient, HttpStatus.CREATED);
     } 
-    
+    @GetMapping("/fetchByUserName/{userName}")
+    public ResponseEntity<Patient> viewPatientByUserName(@PathVariable("userName") String userName) {
+        return new ResponseEntity<>(service.getPatientByUserName(userName), HttpStatus.OK);
+    }
+
 
     // View all patients
     @GetMapping("/viewAllPatients")

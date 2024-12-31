@@ -79,10 +79,21 @@ public class Patient {
     @Column(name = "status") // Maps to the database column 'status'
     private String status;
 
+    @OneToOne
+    @JoinColumn(name="user_name")
+    private UserInfo user;
+
     @OneToMany(mappedBy = "patientObj", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Appointment> appointmentList;  // List of appointments
 
+    public UserInfo getUser() {
+		return user;
+	}
+
+	public void setUser(UserInfo user) {
+		this.user = user;
+	}    
     // Getters and Setters
     public List<Appointment> getAppointmentList() {
         return appointmentList;

@@ -1,5 +1,6 @@
 package com.hms.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hms.entities.Doctor;
+import com.hms.entities.Patient;
 
 
 @Controller
@@ -36,6 +39,42 @@ public class DoctorUIController {
     public DoctorUIController(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+    
+    Doctor docSession=null;
+
+    Patient patSession=null;
+   
+    String role = "admin";
+    
+    @ModelAttribute
+    public void getDoc(@SessionAttribute(name = "docObj", required = false) Doctor docObj) {
+    	if (docObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+docObj+"  "+docObj.getDoctorId());
+	    	docSession = docObj;
+	    	//role="doctor";
+	    	
+    	}    	
+    }
+    
+    @ModelAttribute
+    public void getPatient(@SessionAttribute(name = "patObj", required = false) Patient patObj) {
+    	if (patObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
+	    	patSession = patObj;
+	    	//role="patient";
+    	}    	
+    }
+
+    @ModelAttribute
+    public void getRole(@SessionAttribute(name = "role", required = false) String userRole) {
+    	if (userRole != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+role);
+	    	role = userRole;
+	    	
+    	}    	
+    }
+
+    
     @GetMapping("/doctorHome")
     public String homePage() {
         return "home"; // This should map to a 'home.html' in the templates folder
@@ -230,6 +269,10 @@ public class DoctorUIController {
     // Search Doctor by Specialization Form
     @GetMapping("/searchBySpecializationForm")
     public String searchBySpecializationForm(Model model) {
+    	
+    	model.addAttribute("role",role);
+    	System.out.println("in form "+role);
+    
         return "searchBySpecializationForm";
     }
     
@@ -245,10 +288,15 @@ public class DoctorUIController {
         } catch (Exception e) {
             model.addAttribute("error", "Failed to fetch doctors. Please try again.");
         }
+        model.addAttribute("role",role);
+    	System.out.println("in logic "+role);
+
         return "searchBySpecializationForm";
     }
     @GetMapping("/freeSlotsForm")
     public String freeSlotsForm(Model model) {
+    	model.addAttribute("role",role);
+    	System.out.println("in form "+role);
         return "freeSlotsForm";
     }
 
@@ -282,6 +330,9 @@ public class DoctorUIController {
         } catch (Exception e) {
             model.addAttribute("error", "An unexpected error occurred. Please try again later.");
         }
+
+        model.addAttribute("role",role);
+    	System.out.println("in logic "+role);
 
         return "freeSlotsForm";
     }
