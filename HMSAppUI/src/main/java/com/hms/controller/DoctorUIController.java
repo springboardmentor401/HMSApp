@@ -51,7 +51,6 @@ public class DoctorUIController {
     	if (docObj != null) {
 	    	System.out.println("SESSSSSIIOOOOOON  "+docObj+"  "+docObj.getDoctorId());
 	    	docSession = docObj;
-	    	//role="doctor";
 	    	
     	}    	
     }
@@ -61,7 +60,7 @@ public class DoctorUIController {
     	if (patObj != null) {
 	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
 	    	patSession = patObj;
-	    	//role="patient";
+	    	
     	}    	
     }
 
@@ -183,7 +182,6 @@ public class DoctorUIController {
 
     // Update Doctor Form
     @GetMapping("/getDocIdToUpdate")
-
     public String getDocIdToUpdate() {
 
     	return "getDocIdToUpdate";
@@ -191,7 +189,6 @@ public class DoctorUIController {
     }// Update Doctor Form
 
     @GetMapping("/updateDoctorForm")
-
     public String updateDoctorForm(@RequestParam int doctorId, Model model) {
 
         String url = baseUrl + "/doctors/getDoctor/" + doctorId;
@@ -239,7 +236,24 @@ public class DoctorUIController {
         try {
             restTemplate.put(url, doctor);
             model.addAttribute("message", "Doctor updated successfully!");
-        } catch (Exception e) {
+        } 
+        catch (HttpClientErrorException | HttpServerErrorException e) {
+
+            e.printStackTrace();
+        	Map<String, String> errors;
+            try {
+
+                errors = new ObjectMapper().readValue(e.getResponseBodyAsString(), new TypeReference<>() {});
+
+                model.addAttribute("errorMessage", errors.get("message"));
+
+            } catch (JsonProcessingException ex) {
+
+                ex.printStackTrace();
+
+            }
+        }        
+        catch (Exception e) {
             model.addAttribute("error", "Failed to update doctor. Please try again.");
         }
         return "updateDoctor";
@@ -259,8 +273,27 @@ public class DoctorUIController {
         String url = baseUrl + "/doctors/leaveDoctor/" + doctorId;
         try {
             restTemplate.put(url, null);
-            model.addAttribute("message", "Doctor's status updated to 'left'.");
-        } catch (Exception e) {
+            model.addAttribute("successMessage", "Doctor's status updated to 'left'.");
+        } 
+        catch (HttpClientErrorException | HttpServerErrorException e) {
+
+            e.printStackTrace();
+
+        	Map<String, String> errors;
+
+            try {
+
+                errors = new ObjectMapper().readValue(e.getResponseBodyAsString(), new TypeReference<>() {});
+
+                model.addAttribute("errorMessage", errors.get("message"));
+
+            } catch (JsonProcessingException ex) {
+
+                ex.printStackTrace();
+
+            }
+        }
+        catch (Exception e) {
             model.addAttribute("error", "Failed to update doctor's status. Please try again.");
         }
         return "deleteDoctorForm";
@@ -271,8 +304,6 @@ public class DoctorUIController {
     public String searchBySpecializationForm(Model model) {
     	
     	model.addAttribute("role",role);
-    	System.out.println("in form "+role);
-    
         return "searchBySpecializationForm";
     }
     
@@ -289,14 +320,13 @@ public class DoctorUIController {
             model.addAttribute("error", "Failed to fetch doctors. Please try again.");
         }
         model.addAttribute("role",role);
-    	System.out.println("in logic "+role);
-
         return "searchBySpecializationForm";
     }
+
+    
     @GetMapping("/freeSlotsForm")
     public String freeSlotsForm(Model model) {
     	model.addAttribute("role",role);
-    	System.out.println("in form "+role);
         return "freeSlotsForm";
     }
 
@@ -332,9 +362,7 @@ public class DoctorUIController {
         }
 
         model.addAttribute("role",role);
-    	System.out.println("in logic "+role);
-
-        return "freeSlotsForm";
+    	return "freeSlotsForm";
     }
     
 }

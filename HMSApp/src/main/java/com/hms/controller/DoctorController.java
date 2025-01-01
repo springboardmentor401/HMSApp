@@ -75,7 +75,7 @@ public class DoctorController {
                 if (isDeactivated) {
                     return ResponseEntity.ok("Doctor successfully deactivated.");
                 } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Doctor not found.");
+                    throw new InvalidEntityException("Doctor id is invalid.");
                 }
            
             }

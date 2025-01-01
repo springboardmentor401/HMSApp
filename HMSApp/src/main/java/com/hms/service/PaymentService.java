@@ -40,7 +40,7 @@ public class PaymentService {
     @Transactional
     public Payment addPayment(Payment payment, int billId) throws InvalidEntityException {
         Bill bill = billRepo.findById(billId)
-                .orElseThrow(() -> new InvalidEntityException("Bill with ID " + billId + " not found", null));
+                .orElseThrow(() -> new InvalidEntityException("Bill with ID " + billId + " not found"));
         System.out.println(bill);
         if (bill.getAppointment() != null) {
             System.out.println("Appointment ID: " + bill.getAppointment().getAppointmentId());

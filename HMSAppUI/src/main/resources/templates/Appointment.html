@@ -44,6 +44,8 @@
     </style>
 </head>
 <body>
+	
+	
     <h1>Book Appointment</h1>
     <form th:action="@{/bookAppointment}" th:object="${appointment}" method="post">
         <div>
@@ -78,7 +80,24 @@
             <label for="startTime">Start Time</label>
             <input type="time" id="startTime" th:field="*{startTime}" th:value="${appointment.startTime}" />
             <div th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}" style="color:red"></div>
-        </div>
+			<div id="timeError" style="color:red;"></div>
+		</div>
+		<script>
+		    const startTimeInput = document.getElementById('startTime');
+		    const timeErrorDiv = document.getElementById('timeError');
+
+		    startTimeInput.addEventListener('change', function () {
+		        const startTime = startTimeInput.value;
+
+		        // Check if the time is outside the valid range
+		        if (startTime < "09:00" || startTime > "16:00") {
+		            timeErrorDiv.textContent = "Start time must be between 09:00 and 16:00.";
+		            startTimeInput.value = ""; // Clear only the invalid field
+		        } else {
+		            timeErrorDiv.textContent = ""; // Clear the error message
+		        }
+		    });
+		</script>
 
         <div>
             <label for="reasonForVisit">Reason for Visit</label>
@@ -94,9 +113,7 @@
     </div>
     
     <div>
-    	<p th:text="'Start Time: ' + ${appointment.startTime}"></p>
-		<br>
-		<a href="/patient/appointmentinfo" class="btn btn-secondary">Back to Home</a>
+    	<a href="/patient/appointmentinfo" class="btn btn-secondary">Back to Home</a>
 	</div>
 </body>
 </html>

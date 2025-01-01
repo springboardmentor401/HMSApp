@@ -46,9 +46,7 @@ public class AppointmentController {
     public void getDoc(@SessionAttribute(name = "docObj", required = false) Doctor docObj) {
     	if (docObj != null) {
 	    	System.out.println("SESSSSSIIOOOOOON  "+docObj+"  "+docObj.getDoctorId());
-	    	docSession = docObj;
-	    	//role="doctor";
-	    	
+	    	docSession = docObj;	    	
     	}    	
     }
     
@@ -57,7 +55,7 @@ public class AppointmentController {
     	if (patObj != null) {
 	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
 	    	patSession = patObj;
-	    	//role="patient";
+	    	
     	}    	
     }
 
@@ -86,7 +84,7 @@ public class AppointmentController {
                 new ParameterizedTypeReference<List<Doctor>>() {}
         );
         List<Doctor> doctors = response.getBody();
-        System.out.println(response.getBody());
+        
     	return doctors;
     }
     @GetMapping("/AppointmentForm")
@@ -217,10 +215,12 @@ public class AppointmentController {
 
         return "ViewAppointmentByIdForm";
     }
+    
     @GetMapping("/rescheduleGetAppIdForm")
     public String rescheduleGetAppIdForm() {
     	return "rescheduleGetAppIdForm";
     }
+    
     @GetMapping("/getAppointmentById")
     public String getAppointmentById(@RequestParam("appointmentId") int appointmentId, Model model) {
     	
@@ -235,6 +235,7 @@ public class AppointmentController {
         } 
         catch (HttpClientErrorException.NotFound e) {
             model.addAttribute("errorMessage", "Appointment with ID " + appointmentId + " not found.");
+            return "rescheduleGetAppIdForm";
         } 
         catch (Exception e) {
         	e.printStackTrace();
@@ -269,7 +270,6 @@ public class AppointmentController {
                 errors = new HashMap<>();
                 errors.put("message", "An unexpected error occurred while processing your request.");
             }
-            System.out.println(errors.get("message"));
             model.addAttribute("message", errors.get("message")); 
             model.addAttribute("id",appointmentId);
             return "rescheduleAppointment";
@@ -279,7 +279,7 @@ public class AppointmentController {
         	e.printStackTrace();
         }
 
-        return "home"; 
+        return "/patient/appointmentinfo"; 
     }
     @GetMapping("/cancel")
     public String cancel() {
@@ -296,7 +296,19 @@ public class AppointmentController {
             model.addAttribute("message", "Your appointment with ID " + appointmentId + " has been successfully canceled.");
         } 
         catch (HttpClientErrorException.NotFound e) {
-            model.addAttribute("errorMessage", "Appointment with ID " + appointmentId + " not found.");
+        	Map<String, String> errors=null;;
+            try {
+                errors = new ObjectMapper().readValue(
+                    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {}
+                );
+               
+            } catch (JsonProcessingException | IllegalArgumentException ex) {
+                ex.printStackTrace(); // Log the error
+                errors = new HashMap<>();
+                errors.put("message", "An unexpected error occurred while processing your request.");
+            }
+            model.addAttribute("errorMessage", errors.get("message")); 
+            
         } 
         catch (Exception e) {
             e.printStackTrace();
@@ -304,6 +316,7 @@ public class AppointmentController {
         }
         return "cancelAppointment";
     }
+    
     @GetMapping("/patientsWithAppointmentToday")
     public String getPatientsWithAppointmentToday(Model model) {
         String backendUrl = BASE_URL + "/api/appointments/patientsWithAppointmentCurrentDay";
@@ -326,13 +339,14 @@ public class AppointmentController {
 			
 				// Map backend error message to Model
 				model.addAttribute("errorMessage", errors.get("message")); //mapname.get(key) ->value
-			}catch (Exception e1) {
-            e1.printStackTrace();
-            model.addAttribute("errorMessage", "Error fetching patients: " + e1.getMessage());
-        }
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				model.addAttribute("errorMessage", "Error fetching patients: " + e1.getMessage());
+			}
         }
         return "patientsWithAppointments"; 
     }
+    
     @GetMapping("/viewAppointmentsForCurrentDate")
     public String viewAppointmentsForCurrentDate(Model model) {
         LocalDate currentDate = LocalDate.now();
@@ -347,16 +361,22 @@ public class AppointmentController {
             );
             List<Appointment> appointments = response.getBody();
             model.addAttribute("appointments", appointments);
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("errorMessage", "Error fetching appointments: " + e.getMessage());
+        }  catch (HttpClientErrorException | HttpServerErrorException e) {
+            // Handle 404 error specifically
+        	Map<String, String> errors=null;;
+			try {
+				errors = new ObjectMapper().readValue(
+				    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {});
+			
+				// Map backend error message to Model
+				model.addAttribute("errorMessage", errors.get("message")); //mapname.get(key) ->value
+		}catch (Exception e1) {
+            e1.printStackTrace();
+            model.addAttribute("errorMessage", "Error fetching patients: " + e1.getMessage());
         }
+     }
         
         return "appointmentsForToday";  
     }
-
-
-
-    
 
 }

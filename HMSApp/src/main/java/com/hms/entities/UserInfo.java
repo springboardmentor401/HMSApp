@@ -44,8 +44,6 @@ public class UserInfo {
 
 	public void setRole(String role) {
 		this.role = role;
-	}
-
-   
+	}   
 }
 

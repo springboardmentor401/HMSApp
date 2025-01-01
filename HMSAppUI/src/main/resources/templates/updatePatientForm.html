@@ -9,7 +9,7 @@
     <h2>Fetch Patient by ID</h2>
 	
     <!-- Form to fetch patient details by ID -->
-    <form th:action="@{/fetchPatientForUpdate}" method="post">
+    <form th:action="@{/fetchPatientForUpdate}" method="get">
         <label for="patientId">Patient ID:</label>
         <input  id="patientId" name="patientId" required />
         <button type="submit">Fetch Patient</button>

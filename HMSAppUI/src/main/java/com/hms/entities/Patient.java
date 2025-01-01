@@ -26,8 +26,15 @@ public class Patient {
     private String others;
     private String status;
 
+    private UserInfo user;
+    
+	public UserInfo getUser() {
+		return user;
+	}
 
-	
+	public void setUser(UserInfo user) {
+		this.user = user;
+	}
 
 	public String getStatus() {
 		return status;

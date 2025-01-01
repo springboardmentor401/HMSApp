@@ -65,13 +65,13 @@ public class AppointmentService {
     public String cancelAppointment(int appointmentId) throws InvalidEntityException{
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new InvalidEntityException("Appointment not found"));
-        if (appointment.getAppointmentDate().isAfter(LocalDate.now()) || appointment.getAppointmentDate().isEqual(LocalDate.now())) {
+        if ((appointment.getAppointmentDate().isAfter(LocalDate.now()) || appointment.getAppointmentDate().isEqual(LocalDate.now())) && appointment.getStatus().equalsIgnoreCase("Scheduled")) {
             appointment.setStatus("Cancelled");
             appointmentRepository.save(appointment);
 
             return "Appointment cancelled successfully.";
         } else {
-            return "Cannot cancel an appointment in the past.";
+            throw new InvalidEntityException( "Cannot cancel an appointment in the past / completed appointment.");
         }
     }
 
@@ -80,7 +80,7 @@ public class AppointmentService {
                 .orElseThrow(() -> new InvalidEntityException("Appointment not found"));
 
         
-        if (appointment.getStatus().equalsIgnoreCase("Scheduled")) {
+        if (appointment.getStatus().equalsIgnoreCase("Scheduled") && (appointment.getAppointmentDate().isAfter(LocalDate.now()) || appointment.getAppointmentDate().isEqual(LocalDate.now()))) {
             appointment.setAppointmentDate(newDate);
             appointment.setStartTime(newTime);
             appointment.calculateEndTime(); // Update the end time as well

@@ -1,15 +1,14 @@
 package com.hms.repository;
 
-import com.hms.entities.Appointment;
-import com.hms.entities.Doctor;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.hms.entities.Appointment;
+import com.hms.entities.Doctor;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 

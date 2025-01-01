@@ -110,6 +110,9 @@
         <a th:href="@{/addPatientForm}">Register Patient</a>
         <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
         <p th:if="${message}" th:text="${message}" class="error-message"></p>
+		<p th:if="${messagePat}" th:text="${messagePat}" class="error-message"></p>
+				
+		
     </div>
 </body>
 </html>

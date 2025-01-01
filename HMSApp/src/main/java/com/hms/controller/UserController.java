@@ -20,7 +20,6 @@ public class UserController {
     @PostMapping("/register")
     public UserInfo register(@RequestBody UserInfo user) throws InvalidEntityException {
     	
-    	System.out.println("!!! "+user.getUserName());
     	return userService.addUser(user);
         
     }

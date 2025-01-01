@@ -27,7 +27,7 @@ public class Doctor {
     private int doctorId;
 
     @NotBlank(message = "Doctor name cannot be blank")
-    @Size(min = 2, max = 100, message = "Doctor name must be between 2 and 100 characters")
+    @Size(min = 4, max = 30, message = "Doctor name must be between 4 and 30 characters")
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Doctor name must contain only alphabets and spaces")
     @Column
     private String doctorName;

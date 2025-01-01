@@ -112,16 +112,10 @@ public class PatientController {
    
    
     @PutMapping("/updatePatient/{id}")
-    public ResponseEntity<?> updatePatient(@PathVariable("id") int id, @RequestBody @Valid Patient updatedPatient, BindingResult result) {
+    public ResponseEntity<?> updatePatient(@PathVariable("id") int id, @RequestBody Patient updatedPatient) {
         // Handle validation errors
     	
-        if (result.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.badRequest().body(errors);  // Return validation errors in the response
-        }
-
-        try {
+       
             // Fetch the existing patient by ID
             Patient existingPatient = service.getPatientById(id);
             
@@ -131,16 +125,14 @@ public class PatientController {
 
             // Ensure the ID is preserved in the updated patient object
             updatedPatient.setPatientId(id); 
-
+            updatedPatient.setUser(existingPatient.getUser());
+            updatedPatient.setDateOfBirth(existingPatient.getDateOfBirth());
+            updatedPatient.setStatus(existingPatient.getStatus());
             // Call service to update the patient in the database
             Patient savedPatient = service.updatePatient(updatedPatient);
 
             return ResponseEntity.ok(savedPatient); // Return the updated patient in the response
-        } catch (Exception e) {
-            // Handle unexpected errors
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Error updating patient: " + e.getMessage()); // Return error message if something goes wrong
-        }
+        
     }
 
 
@@ -148,12 +140,11 @@ public class PatientController {
     @GetMapping("/by-doctor-and-date")
     public ResponseEntity<?> getPatientsByDoctorAndDate(
             @RequestParam int doctorId,
-            @RequestParam @DateTimeFormat LocalDate appDate) {
+            @RequestParam @DateTimeFormat LocalDate appDate) throws InvalidEntityException {
         List<Patient> patients = service.getPatientsByDoctorAndDate(doctorId, appDate);
         
         if (patients == null || patients.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No patients found for doctorId: " + doctorId + " on date: " + appDate);
+            throw new InvalidEntityException("No patients found for doctorId: " + doctorId + " on date: " + appDate);
         }
         return ResponseEntity.ok(patients);
     }

@@ -18,6 +18,13 @@
             </div>
             <button type="submit" class="btn btn-primary">View Patients</button>
         </form>
+		
+		
+		<!-- Display Error Message if No appointments Found -->
+		    <div th:if="${error}">
+		        <p style="color: red;" th:text="${error}"></p>
+		    </div>
+
 		<a href="/admin/patientinfo" class="btn btn-secondary mt-3">Back to Home</a>
     </div>
 </body>

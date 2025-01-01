@@ -63,33 +63,27 @@ public class UserUIController {
             	session.setAttribute("role","");
             	session.setAttribute("docObj", null);
             	session.setAttribute("patObj", null);
-                
-                session.setAttribute("userObj", res.getUserName());
+            	session.setAttribute("userObj", null);
+
             	if(res.getRole().equalsIgnoreCase("admin")) {
-            		
-                	session.setAttribute("role","admin");
-                        		
-                	return "/admin/admin";
+            		session.setAttribute("role","admin");
+                    return "/admin/admin";
                 }
                 else if(res.getRole().equalsIgnoreCase("doctor")) {
                 	
-                	System.out.println("http://localhost:7220/doctors/fetchByUserName/" + res.getUserName());
                 	ResponseEntity<Doctor> resp = restTemplate.getForEntity(apiBaseUrl+"/doctors/fetchByUserName/" + res.getUserName(), Doctor.class);
                 	Doctor docObj = resp.getBody();
                 	session.setAttribute("role","doctor");
                 	session.setAttribute("docObj", docObj);
-//                	model.addAttribute("role","doctor");
-//                	model.addAttribute("docId", docObj.getDoctorId());
                 	return "doctorhome";
                 }
                 else if (res.getRole().equalsIgnoreCase("patient")) {
-                    System.out.println("HELLLLLLLLLOOOOOOOOOOOOO");
                     ResponseEntity<Patient> patObj = restTemplate.getForEntity(apiBaseUrl + "/api/patient/fetchByUserName/" + res.getUserName(), Patient.class);
-                    
+                    Patient p1 = patObj.getBody();
                     session.setAttribute("role", "patient");
                     session.setAttribute("patObj", patObj.getBody());
-                    
-                    return "/patient/patient";  // Or redirect as needed
+                    session.setAttribute("userObj", userInfo);
+                    return "/patient/patient";  
                 }
                 else
                 {
@@ -133,7 +127,7 @@ public class UserUIController {
     	session.setAttribute("role", "");
     	
         session.invalidate();
-    	return "logout"; // Create a Thymeleaf template `dashboard.html` for this
+    	return "logout"; // Create a Thymeleaf template `logout.html` for this
     }
     
     @GetMapping("/admin")
@@ -198,87 +192,4 @@ public class UserUIController {
     
 }
 
-//@GetMapping("/doctors/addDoctorForm")
-//public String showAddDoctorForm(Model model) {
-//  model.addAttribute("doctor", new Doctor());
-//  return "addDoctor";
-//}
-//
-//// Adjust the POST mapping to match the correct form action
-//
-//@PostMapping("/doctors/addDoctor")
-//
-//public String addDoctor(@ModelAttribute Doctor doctor, BindingResult result, Model model) {
-//
-//  System.out.println(doctor.getDoctorId()+" "+doctor.getDoctorName());  	
-//
-//	try {
-//
-//      // Sending POST request to backend API to add the doctor
-//		String BASE_URL = "http://localhost:7220";
-//	    ResponseEntity<String> response = this.restTemplate.postForEntity(    	    		
-//              BASE_URL + "/doctor/addDoctor", doctor, String.class);
-//      model.addAttribute("message", "Doctor added successfully: " + response.getBody());
-//      model.addAttribute("userInfo", new UserInfo());
-//      return "login";
-//
-//	} 
-//
-//  catch (HttpClientErrorException.BadRequest e) {
-//
-//  	e.printStackTrace();
-//      // Parse and display validation errors from backend
-//
-//      Map<String, String> errors=null;;
-//
-//				try {
-//
-//					errors = new ObjectMapper().readValue(
-//
-//					    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {});
-//
-//				} catch (JsonMappingException e1) {
-//
-//					// TODO Auto-generated catch block
-//
-//					e1.printStackTrace();
-//
-//				} catch (JsonProcessingException e1) {
-//
-//					// TODO Auto-generated catch block
-//
-//					e1.printStackTrace();
-//
-//				}
-//
-//			// Map backend errors to BindingResult				
-//
-//			for(Map.Entry<String, String> entryset : errors.entrySet()) {
-//
-//				String field = entryset.getKey();
-//
-//				String errorMsg = entryset.getValue();							
-//
-//				result.rejectValue(field,"",errorMsg);
-//			}
-//
-//			return "addDoctor";
-//  }
-//	catch (HttpClientErrorException | HttpServerErrorException e) {
-//      // Parse and display error message from backend
-//  	Map<String, String> errors=null;;
-//		try {
-//			errors = new ObjectMapper().readValue(
-//			    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {});
-//		
-//			// Map backend error message to Model
-//			model.addAttribute("errorMessage", errors.get("message")); //mapname.get(key) ->value
-//		} catch (JsonProcessingException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		return "addDoctor";			
-//  }
-//	
-//
-//}
+

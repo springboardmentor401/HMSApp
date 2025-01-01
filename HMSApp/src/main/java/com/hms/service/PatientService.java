@@ -43,14 +43,16 @@ public class PatientService {
 
     
     public Patient getPatientByUserName(String username) {
-        return patientRepository.findByUserUserName(username);
+        Patient p =  patientRepository.findByUserUserName(username);
+       
+        return p;
     }
 
     public Patient addPatient(Patient patient) throws InvalidEntityException {
         patient.setStatus("Active");
 
         String temp = patient.getContactNumber().substring(6);//patient.getContactNumber().length()-4);
-        UserInfo u = new UserInfo(patient.getPatientName().substring(0,4)+temp, "test", "patient");
+        UserInfo u = new UserInfo(patient.getPatientName().substring(0,3)+temp, "test", "patient");
         patient.setUser(u);
         userService.addUser(u);        
     	
@@ -108,22 +110,7 @@ public class PatientService {
         emailService.sendEmail(patient.getEmailId(), subject, text);
         return updatedPatient;
     }
-    // Optional: Fetch patient by ID (if needed for PATCH requests)
- 
-
-    // public List<Patient> getPatientsByDoctorAndDate(int doctorId, LocalDate appDate) {
-    //     List<Patient> patients = appointmentRepository.findPatientsByDoctorAndDate(doctorId, appDate);
-    //     if (patients == null || patients.isEmpty()) {
-    //         // Optionally, log or throw a custom exception
-    //         return List.of(); // Return empty list if no patients found
-    //     }
-    //     return patients;
-    // }
-
-	public Patient updatePatientDetails(int id, Map<String, String> updates) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+   
 	
     @Autowired
     private AppointmentRepository appointmentRepository;
@@ -173,15 +160,12 @@ public class PatientService {
 
     public List<Patient> getPatientsWithNoShowAppointments() {
         // Find all appointments with status "Pending"
-        List<Appointment> pendingAppointments = appointmentRepository.findByStatus("Pending");
+        List<Patient> pendingAppointments = appointmentRepository.findPatientsWithPastScheduledAppointments();
 
         // Extract and return distinct patients associated with pending appointments
-        return pendingAppointments.stream()
-            .map(Appointment::getPatientObj
-    )  // Get the patient associated with the appointment
-            .distinct()  // Ensure patients are not duplicated in case of multiple pending appointments
-            .collect(Collectors.toList());
-}
+        return pendingAppointments;
+    }
+            
 }
 
 

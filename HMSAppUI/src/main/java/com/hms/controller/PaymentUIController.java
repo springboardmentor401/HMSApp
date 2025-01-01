@@ -9,7 +9,7 @@ import com.hms.entities.Appointment;
 import com.hms.entities.Bill;
 import com.hms.entities.Patient;
 import com.hms.entities.Payment;
-
+import com.hms.entities.UserInfo;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,8 +32,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -89,10 +87,43 @@ public class PaymentUIController {
     // ******************** USER PROFILE ********************
 
     // User Profile - Show Payment Page
+    Patient patSession=null;
+    //    Patient patSession;
+
+    String role = "admin";
     
-    @GetMapping("/patient/{id}/payments")
-    public String viewPaymentsByPatient(@PathVariable("id") int patientId, Model model) {
+    
+    @ModelAttribute
+    public void getPatient(@SessionAttribute(name = "patObj", required = false) Patient patObj) {
+    	if (patObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
+	    	patSession = patObj;
+	    	//role="patient";
+    	}    	
+    }
+
+    @ModelAttribute
+    public void getRole(@SessionAttribute(name = "role", required = false) String userRole) {
+    	if (userRole != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+role);
+	    	role = userRole;
+	    	
+    	}    	
+    }
+
+    @GetMapping("/patient/payments")
+    public String viewPaymentsByPatient(@RequestParam(value="patientId",required=false) Integer patientId, Model model) {
         // Call your service or API to get payments data for this patient
+    	System.out.println(role+" "+patSession);
+    	if(role!=null && role.equals("patient") && patientId==null && patSession!=null) {
+    		patientId = patSession.getPatientId();
+    	}
+    	else if(role.equals("patient") && patientId==null && patSession==null) 
+        {
+        	model.addAttribute("userInfo", new UserInfo());
+            return "login";
+        }
+    	
         ResponseEntity<Payment[]> response = restTemplate.exchange(
             "http://localhost:7220/api/payments/patient/" + patientId,
             HttpMethod.GET,

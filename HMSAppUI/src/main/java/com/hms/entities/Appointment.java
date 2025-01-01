@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Appointment {
 
-    private int appointmentId; // Use Integer for id fields
-    private Doctor doctorObj;     // Use Integer to handle null values
-    private Patient patientObj;    // Use Integer to handle null values
+    private int appointmentId; 
+    private Doctor doctorObj;  
+    private Patient patientObj;
     
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate appointmentDate;

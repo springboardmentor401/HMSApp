@@ -15,9 +15,11 @@
 <h1>Patients with Appointments Today</h1>
 
 <!-- Error Message -->
-<p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
-
+<div th:if="${errorMessage != null}">
+<p th:text="${errorMessage}" class="error-message"></p>
+</div>
 <!-- Table Content -->
+<div th:if="${errorMessage == null}">
 <div th:if="${patients != null && patients.size() > 0}">
     <table border="1">
         <thead>
@@ -29,17 +31,22 @@
             </tr>
         </thead>
         <tbody>
+			
             <tr th:each="patient : ${patients}">
-                <td th:text="${patient.patientId}"></td>
+				<div th:if="${patient.appointmentList != null && patient.appointmentList.size() > 0}">
+								
+				<td th:text="${patient.patientId}"></td>
                 <td th:text="${patient.patientName}"></td>
                 <!-- Assuming you are fetching the first appointment from the list of appointments -->
-                <td th:text="${patient.appointmentList[0].appointmentDate}"></td>
+				<td th:text="${patient.appointmentList[0].appointmentDate}"></td>
                 <td th:text="${patient.appointmentList[0].startTime}"></td>
+				</div>
+								
             </tr>
         </tbody>
     </table>
 </div>
-
+</div>
 <a href="/admin/appointmentinfo" class="btn btn-secondary mt-3">Back to Home</a>
 </body>
 </html>

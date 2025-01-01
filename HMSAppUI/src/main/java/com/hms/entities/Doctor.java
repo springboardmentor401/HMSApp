@@ -5,9 +5,7 @@ package com.hms.entities;
 import java.time.LocalDate;
 
 
-public class Doctor {
-
-   
+public class Doctor {   
 
     private int doctorId;
 
@@ -32,6 +30,16 @@ public class Doctor {
 
     private int yearsOfExperience;
     private boolean status=true;
+
+    private UserInfo user;
+    
+	public UserInfo getUser() {
+		return user;
+	}
+
+	public void setUser(UserInfo user) {
+		this.user = user;
+	}
 
 
     public int getDoctorId() {

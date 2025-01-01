@@ -16,7 +16,7 @@ public class Patient {
     private int patientId;
 
     @NotBlank(message = "Patient name is required")
-    @Pattern(regexp = "^[A-Za-z ]{3,30}$", message = "Name must contain only alphabetic characters and spaces, with a length between 3 and 30 characters.")
+    @Pattern(regexp = "^[A-Za-z ]{4,30}$", message = "Name must contain only alphabetic characters and spaces, with a length between 4 and 30 characters.")
     @Column(name = "patient_name") // Maps to the database column 'patient_name'
     private String patientName;
 

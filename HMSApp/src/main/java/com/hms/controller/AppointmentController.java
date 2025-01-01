@@ -62,28 +62,25 @@ public class AppointmentController {
     }
     @PutMapping("/cancel/{appointmentId}")
     public ResponseEntity<String> cancelAppointment(@PathVariable("appointmentId") int appointmentId)throws InvalidEntityException {
-        try {
             appointmentService.cancelAppointment(appointmentId);
             return ResponseEntity.ok("Appointment has been successfully cancelled.");   
-        }
-        catch (InvalidEntityException e) {
-            return ResponseEntity.status(404).body("Appointment not found.");
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(500).body("An unexpected error occurred while processing your request.");
-        }
+       
     }
     @GetMapping("/patientsWithAppointmentCurrentDay")
     public ResponseEntity<List<Patient>> getPatientsWithAppointmentCurrentDay() throws InvalidEntityException {
         LocalDate currentDate = LocalDate.now();
         List<Patient> patients = appointmentService.getPatientsWithAppointmentsOnDate(currentDate);
-        
+        if(patients==null || patients.isEmpty())
+        	throw new InvalidEntityException("No patients with appointment for today");
         return ResponseEntity.ok(patients);
     }
     @GetMapping("/appointmentsForDate/{date}")
-    public List<Appointment> viewAppointmentsForDate(@PathVariable("date") String date) {
+    public List<Appointment> viewAppointmentsForDate(@PathVariable("date") String date) throws InvalidEntityException {
         LocalDate requestedDate = LocalDate.parse(date); // Convert string date to LocalDate
-        return appointmentService.getAppointmentsForDate(requestedDate);
+        List<Appointment> patients = appointmentService.getAppointmentsForDate(requestedDate);
+        if(patients==null || patients.isEmpty())
+        	throw new InvalidEntityException("No appointments for today");
+        return patients;
     }
 
 }

@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hms.entities.Doctor;
 import com.hms.entities.Patient;
+import com.hms.entities.UserInfo;
 
 @Controller
 public class PatientUIController {
@@ -44,25 +45,36 @@ public class PatientUIController {
     Doctor docSession=null;
 
     Patient patSession=null;
+    
+    UserInfo userSession = null;
    
     String role = "admin";
     
     @ModelAttribute
     public void getDoc(@SessionAttribute(name = "docObj", required = false) Doctor docObj) {
+    	System.out.println("Session obj doc "+docObj);
     	if (docObj != null) {
 	    	System.out.println("SESSSSSIIOOOOOON  "+docObj+"  "+docObj.getDoctorId());
 	    	docSession = docObj;
-	    	//role="doctor";
-	    	
     	}    	
     }
     
     @ModelAttribute
     public void getPatient(@SessionAttribute(name = "patObj", required = false) Patient patObj) {
+    	System.out.println("Session obj pat "+patObj);
     	if (patObj != null) {
-	    	System.out.println("SESSSSSIIOOOOOON  "+patObj+"  "+patObj.getPatientId());
+	    	
 	    	patSession = patObj;
-	    	//role="patient";
+	    	System.out.println("SESSSSSIIOOOOOON  "+patSession+"  "+patSession.getPatientId());
+    	}    	
+    }
+
+    @ModelAttribute
+    public void getUser(@SessionAttribute(name = "userObj", required = false) UserInfo userObj) {
+    	System.out.println("Session obj user "+userObj);
+    	if (userObj != null) {
+	    	System.out.println("SESSSSSIIOOOOOON  "+userObj+"  "+userObj.getUserName());
+	    	userSession = userObj;
     	}    	
     }
 
@@ -71,7 +83,6 @@ public class PatientUIController {
     	if (userRole != null) {
 	    	System.out.println("SESSSSSIIOOOOOON  "+role);
 	    	role = userRole;
-	    	
     	}    	
     }
 
@@ -98,13 +109,31 @@ public class PatientUIController {
             );
 
             Patient patientRes = response.getBody();
-            model.addAttribute("message", "Patient added successfully with ID " + patientRes.getPatientId());
-            return "home";
+            model.addAttribute("messagePat", "Patient added successfully with ID " + patientRes.getPatientId()+" Check your mail for username and password and login to proceed further");
+            model.addAttribute("userInfo", new UserInfo());
+            return "login";
         } catch (HttpClientErrorException e) {
-            Map<String, String> errors = parseBackendErrors(e);
-            if (errors != null) {
-                errors.forEach((field, errorMsg) -> result.rejectValue(field, "", errorMsg));
-            }
+            // Parse and display validation errors from backend
+            Map<String, String> errors=null;;
+					try {
+						errors = new ObjectMapper().readValue(
+						    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {});
+					} catch (JsonMappingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (JsonProcessingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+//				
+			
+				// Map backend errors to BindingResult				
+				for(Map.Entry<String, String> entryset : errors.entrySet()) {
+					String field = entryset.getKey();
+					String errorMsg = entryset.getValue();							
+					result.rejectValue(field,"",errorMsg);
+				}
+				
             model.addAttribute("error", "Failed to add patient. Please correct the errors.");
             return "addPatient";
         }
@@ -124,21 +153,25 @@ public class PatientUIController {
     @GetMapping("/viewPatientByIdForm")
     public String viewPatientByIdForm(Model model) {
     	 model.addAttribute("role",role);
-     	System.out.println("in form "+role);
-    	
         return "viewPatientByIdForm";
     }
 
     @GetMapping("/viewPatientById")
-    public String viewPatientById(@RequestParam("patientId") int patientId, Model model) {
+    public String viewPatientById(@RequestParam(value="patientId",required = false) Integer patientId, Model model) {
         try {
+        	if(role!=null && role.equals("patient") && patientId==null && patSession!=null) {
+        		patientId = patSession.getPatientId();
+        	}
+        	else if(role.equals("patient") && patientId==null && patSession==null) 
+            {
+            	model.addAttribute("userInfo", new UserInfo());
+                return "login";
+            }
             ResponseEntity<Patient> response = restTemplate.getForEntity(
                 BASE_URL + "/api/patient/viewPatientById/" + patientId,
                 Patient.class
             );
-           
         	model.addAttribute("role",role);
-        	System.out.println("in form "+role);
 
             model.addAttribute("patient", response.getBody());
             return "viewPatientById";
@@ -149,14 +182,11 @@ public class PatientUIController {
             model.addAttribute("error", errors != null ? errors.get("message") : "Patient not found.");
             return "viewPatientByIdForm";
         }
-        //return "viewPatientByIdForm";
     }
 
     @GetMapping("/viewPatientByNameForm")
     public String viewPatientByNameForm(Model model) {
     	 model.addAttribute("role",role);
-     	System.out.println("in form "+role);
-    	
         return "viewPatientByNameForm";
     }
 
@@ -165,36 +195,41 @@ public class PatientUIController {
         try {
             ResponseEntity<List> response = restTemplate.getForEntity(BASE_URL + "/api/patient/viewPatientByName/" + name, List.class);
             model.addAttribute("role",role);
-        	System.out.println("in form "+role);
             model.addAttribute("patients", response.getBody());
             return "viewPatientByName";
         } catch (Exception e) {
             model.addAttribute("error", "No patients found with the name: " + name);
             model.addAttribute("role",role);
-        	System.out.println("in form "+role);
             return "viewPatientByNameForm";
         }
-        //return "viewPatientByName";
     }
 
     @GetMapping("/updatePatientForm")
     public String updatePatientForm(Model model) {
     	model.addAttribute("role",role);
-    	System.out.println("in form "+role);
     	
         model.addAttribute("patient", new Patient());
         return "updatePatientForm";
     }
 
-    @PostMapping("/fetchPatientForUpdate")
-    public String fetchPatientForUpdate(@RequestParam("patientId") int patientId, Model model) {
+    @GetMapping("/fetchPatientForUpdate")
+    public String fetchPatientForUpdate(@RequestParam(value="patientId",required = false) Integer patientId, Model model) {
         try {
+        	
+        	if(role!=null && role.equals("patient") && patientId==null && patSession!=null) {
+        		patientId = patSession.getPatientId();
+        	}
+        	else if(role.equals("patient") && patientId==null && patSession==null) 
+            {
+            	model.addAttribute("userInfo", new UserInfo());
+                return "login";
+            }
+        	
             ResponseEntity<Patient> response = restTemplate.getForEntity(
                 BASE_URL + "/api/patient/viewPatientById/" + patientId,
                 Patient.class
             );
             model.addAttribute("role",role);
-        	System.out.println("in form "+role);
         	
             model.addAttribute("patient", response.getBody());
             return "updatePatient";
@@ -207,7 +242,7 @@ public class PatientUIController {
     @PostMapping("/updatePatients")
     public String updatePatient(@ModelAttribute("patient") Patient patient, BindingResult result, Model model) {
         try {
-            HttpHeaders headers = new HttpHeaders();
+        	HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
 
@@ -220,7 +255,7 @@ public class PatientUIController {
             );
 
             model.addAttribute("message", "Patient updated successfully: " + response.getBody().getPatientName());
-            return "home";
+            return "/patient/patientinfo";
         } catch (HttpClientErrorException e) {
             Map<String, String> errors = parseBackendErrors(e);
             if (errors != null) {
@@ -246,7 +281,6 @@ public class PatientUIController {
             model.addAttribute("error", "No patients found with the medical history: " + medicalHistory);
             return "viewPatientByMedicalHistoryForm";
         }
-        //return "viewPatientByMedicalHistory";
     }
 
     @GetMapping("/viewPatientsByDoctorAndDateForm")
@@ -269,16 +303,12 @@ public class PatientUIController {
         } catch (Exception e) {
 
             model.addAttribute("error", 
-                    "No patients found for doctorId: " + doctorId + " on date: " + appDate + ". Error: " + e.getMessage());
+                    "No patients found for doctorId: " + doctorId + " on date: "+appDate);
             return "viewPatientsByDoctorAndDateForm";
         }
 
           
-        }
-        //return "viewPatientsByDoctorAndDate";
-
-
-
+    }
 
     @GetMapping("/no-show-patients")
     public String getNoShowPatients(Model model) {

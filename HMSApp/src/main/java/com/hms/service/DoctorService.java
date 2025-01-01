@@ -84,8 +84,11 @@ public class DoctorService {
             Doctor doctor = optionalDoctor.get();
             doctor.setstatus(false); // Set status to false
             doctorRepository.save(doctor); // Save updated doctor
+            return true;
         }
-		return true;
+        else
+        	return false;
+		
     }
 
 
