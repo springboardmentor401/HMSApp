@@ -26,21 +26,21 @@
             <tr>
                 <th>Patient ID</th>
                 <th>Patient Name</th>
-                <th>Appointment Date</th>
-                <th>Appointment Time</th>
+		<th>Gender</th>
+		<th>Location</th>
+                <th>Email ID</th>
+                <th>Contact Number</th>
             </tr>
         </thead>
         <tbody>
 			
             <tr th:each="patient : ${patients}">
-				<div th:if="${patient.appointmentList != null && patient.appointmentList.size() > 0}">
-								
-				<td th:text="${patient.patientId}"></td>
+		<td th:text="${patient.patientId}"></td>
                 <td th:text="${patient.patientName}"></td>
-                <!-- Assuming you are fetching the first appointment from the list of appointments -->
-				<td th:text="${patient.appointmentList[0].appointmentDate}"></td>
-                <td th:text="${patient.appointmentList[0].startTime}"></td>
-				</div>
+                <td th:text="${patient.gender}"></td>
+		<td th:text="${patient.location}"></td>
+		<td th:text="${patient.emailId}"></td>
+		<td th:text="${patient.contactNumber}"></td>
 								
             </tr>
         </tbody>
