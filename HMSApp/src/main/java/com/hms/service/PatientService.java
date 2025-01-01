@@ -169,13 +169,17 @@ public class PatientService {
 }
 
 
+    //@Scheduled(cron = "0 0 11 * * ?")  // Runs daily at 11 AM
+//0 → seconds (run at the start of the minute)
+//0 → minutes (run at the start of the hour)
+//11 → hour (11 AM)
+//* → day of the month (every day)
+//* → month (every month)
+//? → 
     
-    
-//I have a doctor class ,patient and an appointment class  I want to send a mail notificationto the  the patient   email id one day prior  to the appointement how to do that
     
 
 
-    //I have an application spring data jpa and springrest .Whenever i add the entity to the database it need to send an email notification to that entity email id
 	
 
 
