@@ -13,6 +13,15 @@ import com.hms.entities.Payment;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // Example of a valid custom query method:
+	
+	@Query("SELECT a.doctorObj.doctorName, SUM(p.amountPaid) " +
+	           "FROM Appointment a " +
+	           "JOIN a.billObj b " +
+	           "JOIN b.pmtList p " +
+	           "WHERE p.paymentDate BETWEEN :fromDate AND :toDate " +
+	           "GROUP BY a.doctorObj.doctorName")
+	    List<Object[]> findDoctorRevenue(@Param("fromDate") LocalDate fromDate, 
+	                                     @Param("toDate") LocalDate toDate);
 
 	    @Query("SELECT p FROM Payment p WHERE p.id = :id")
 	    Payment findPaymentWithDetails(@Param("id") Long id);

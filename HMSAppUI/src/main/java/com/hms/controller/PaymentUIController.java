@@ -236,7 +236,7 @@ public class PaymentUIController {
             // Update the bill's total paid amount
             double updatedTotalPaid = bill.getTotalPaid() + paymentAmount;
             bill.setTotalPaid(updatedTotalPaid);
-            restTemplate.put(billUrl, bill);
+            //restTemplate.put(billUrl, bill);
 
             redirectAttributes.addFlashAttribute("message", "Payment successful!");
         } catch (Exception e) {
@@ -245,8 +245,9 @@ public class PaymentUIController {
             return "redirect:/patient/" + patientId + "/payments";
         }
 
+        System.out.println(paymentAmount);
         redirectAttributes.addFlashAttribute("message", "Payment of ₹" + paymentAmount + " was successful!");
-        return "redirect:/patient/" + patientId + "/payments";
+        return "redirect:/patient/payments?patientId=" + patientId ;
         
     }
 

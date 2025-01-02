@@ -2,6 +2,7 @@ package com.hms.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +59,9 @@ public class BillService {
         double totalAmount = calculateTotalAmount(consultationFees, bill, discountPercentage);
 
         // Set bill details
+        DecimalFormat df=new DecimalFormat("0.00");
+        totalAmount = Double.parseDouble(df.format(totalAmount));
+        
         bill.setTotalAmount(totalAmount);
         bill.setDiscountPercentage(discountPercentage);
         bill.setTaxes(18);
