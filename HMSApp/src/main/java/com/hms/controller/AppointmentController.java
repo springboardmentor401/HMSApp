@@ -82,5 +82,14 @@ public class AppointmentController {
         	throw new InvalidEntityException("No appointments for today");
         return patients;
     }
+    @PutMapping("/update/{appointmentId}")
+    public ResponseEntity<String> updateAppointment(@PathVariable("appointmentId") int appointmentId, @RequestBody Appointment appointment)throws InvalidEntityException {
+        try {
+        	appointmentService.updateAppointmentDetails(appointmentId, appointment.getDoctorReport(), appointment.getMedicineSuggested());
+            return ResponseEntity.ok("Appointment updated successfully.");
+        } catch (InvalidEntityException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 
 }

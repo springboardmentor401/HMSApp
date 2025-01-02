@@ -118,6 +118,22 @@ public class AppointmentService {
                 .filter(appointment -> appointment.getAppointmentDate().equals(date))
                 .collect(Collectors.toList());
     }
+    public void updateAppointmentDetails(int appointmentId, String doctorReport, String medicinesSuggested) throws InvalidEntityException {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new InvalidEntityException("Appointment not found for ID: " + appointmentId));
+
+        // Check if the appointment status is "Scheduled"
+        if (!"Scheduled".equalsIgnoreCase(appointment.getStatus())) {
+            throw new InvalidEntityException("Cannot update an appointment with status: " + appointment.getStatus());
+        }
+
+        // Update only the specified fields
+        appointment.setDoctorReport(doctorReport);
+        appointment.setMedicineSuggested(medicinesSuggested);
+
+        // Save updated appointment
+        appointmentRepository.save(appointment);
+    }
     
     
     

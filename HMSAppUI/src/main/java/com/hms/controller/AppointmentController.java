@@ -378,5 +378,37 @@ public class AppointmentController {
         
         return "appointmentsForToday";  
     }
+    @PostMapping("/updateAppointment")
+    public String updateAppointment(@ModelAttribute("appointment") Appointment appointment, Model model) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        try {
+            // Send updated data to the backend
+            String updateUrl = "http://localhost:7220/api/appointments/" + "/update/" + appointment.getAppointmentId();
+            restTemplate.put(updateUrl, appointment);
+
+            model.addAttribute("message", "Appointment updated successfully!");
+        } catch (HttpClientErrorException e) {
+            // Check for specific HTTP status codes
+            if (e.getStatusCode().value() == 404) {
+                model.addAttribute("errorMessage", "Appointment ID not found. Please provide a valid ID.");
+            } 
+            else if (e.getStatusCode().value() == 400 && e.getResponseBodyAsString().contains("cancelled")) {
+                model.addAttribute("errorMessage", "Cannot update a cancelled appointment.");
+            }
+            else {
+                model.addAttribute("errorMessage", "Failed to update appointment. Please try again.");
+            }
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", "An unexpected error occurred. Please try again.");
+        }
+        return "update-appointment";
+    }
+    @GetMapping("/updateAppointmentForm")
+    public String getUpdateForm(Model model) {
+        model.addAttribute("appointment", new Appointment());
+        return "update-appointment";
+    }
+    
 
 }
