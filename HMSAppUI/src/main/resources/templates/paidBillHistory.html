@@ -101,23 +101,7 @@
             <span th:text="${errorMessage}"></span>
         </div>
 
-        <!-- Search and Filter Form -->
-        <div class="search-container">
-            <form method="get" th:action="@{/paidbills}" class="row g-3 align-items-center">
-                
-                <div class="col-md-3">
-                    <label for="startDate" class="form-label">Start Date</label>
-                    <input type="date" id="startDate" name="startDate" class="form-control">
-                </div>
-                <div class="col-md-3">
-                    <label for="endDate" class="form-label">End Date</label>
-                    <input type="date" id="endDate" name="endDate" class="form-control">
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">Search</button>
-                </div>
-            </form>
-        </div>
+       
 
         <!-- Paid Bills Table -->
         <div th:if="${paidBills != null && paidBills.size() > 0}" class="table-container">

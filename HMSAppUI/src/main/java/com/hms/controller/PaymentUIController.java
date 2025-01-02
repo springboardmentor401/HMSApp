@@ -34,6 +34,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -145,6 +146,8 @@ public class PaymentUIController {
                                        @RequestParam("outstandingAmount") Double outstandingAmount,
                                        Model model) {
         // Use the passed data directly without fetching from the backend
+    	DecimalFormat df = new DecimalFormat("0.00");
+    	outstandingAmount = Double.parseDouble(df.format(outstandingAmount));
         model.addAttribute("billId", billId);
         model.addAttribute("totalAmount", totalAmount);
         model.addAttribute("totalPaid", totalPaid);
