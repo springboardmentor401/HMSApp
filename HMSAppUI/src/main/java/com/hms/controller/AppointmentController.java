@@ -1,6 +1,8 @@
 package com.hms.controller;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -409,6 +412,109 @@ public class AppointmentController {
         model.addAttribute("appointment", new Appointment());
         return "update-appointment";
     }
+    @GetMapping("/viewAllAppointments")
+    public String viewAllAppointments(Model model) {
+        // Fetch all appointments
+        String backendUrl = BASE_URL + "/api/appointments/all";
+        try {
+            ResponseEntity<List<Appointment>> response = restTemplate.exchange(
+                    backendUrl, 
+                    HttpMethod.GET, 
+                    null, 
+                    new ParameterizedTypeReference<List<Appointment>>() {}
+            );
+            List<Appointment> appointments = response.getBody();
+            model.addAttribute("appointments", appointments);
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("errorMessage", "Error fetching appointments: " + e.getMessage());
+        }
+        return "viewAllAppointments"; 
+    }
+    @GetMapping("/lowConsultationDoctorsReport")
+    public String lowConsultationDoctorsReport(
+        @RequestParam(value = "startDate", required = false) String startDate, 
+        @RequestParam(value = "endDate", required = false) String endDate, 
+        Model model) {
+
+        // If the form is just being loaded (no parameters), we can just show the form without doing anything
+        if (startDate == null || endDate == null) {
+            return "lowConsultationDoctorsReport"; // Just return the view without fetching data yet
+        }
+
+        try {
+            // Validate the date format (yyyy-MM-dd)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate start = LocalDate.parse(startDate, formatter);
+            LocalDate end = LocalDate.parse(endDate, formatter);
+
+            // Check if the start date is after the end date
+            if (start.isAfter(end)) {
+                model.addAttribute("errorMessage", "Start date cannot be after end date.");
+                return "lowConsultationDoctorsReport"; // Return to the same view with error message
+            }
+
+            // Prepare the backend URL with the given date range
+            String backendUrl = BASE_URL + "/api/appointments/lowConsultationDoctors?" + "startDate=" + startDate + "&endDate=" + endDate;
+            
+            // Call the backend API using RestTemplate
+            ResponseEntity<List<Doctor>> response = restTemplate.exchange(
+                backendUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Doctor>>() {}
+            );
+            
+            // Extract the doctor list from the response
+            List<Doctor> doctors = response.getBody();
+            
+            // Add the list of doctors to the model
+            model.addAttribute("doctors", doctors);
+            model.addAttribute("startDate", startDate);  // Passing startDate to the view
+            model.addAttribute("endDate", endDate);      // Passing endDate to the view
+            
+        } catch (DateTimeParseException e) {
+            model.addAttribute("errorMessage", "Enter Dates");
+        } catch (HttpClientErrorException e) {
+            // Handle 400 Bad Request errors
+            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                try {
+                    String responseBody = e.getResponseBodyAsString();
+                    // Log the response body to inspect the format
+                    System.out.println("Raw Response Body: " + responseBody);
+
+                    // Try parsing as JSON if it is JSON
+                    try {
+                        Map<String, String> errorDetails = new ObjectMapper().readValue(responseBody, new TypeReference<Map<String, String>>() {});
+                        String errorMessage = errorDetails.getOrDefault("message", "Bad Request: " + e.getMessage());
+                        model.addAttribute("errorMessage", errorMessage);
+                    } catch (JsonProcessingException jsonEx) {
+                        // Handle cases where the response is not valid JSON (e.g., just a plain string)
+                        model.addAttribute("errorMessage", "Enter  " + responseBody);
+                    }
+
+                } catch (Exception ex) {
+                    // Handle any other unforeseen error in processing
+                    ex.printStackTrace();
+                    model.addAttribute("errorMessage", "Unexpected error: " + ex.getMessage());
+                }
+            } else {
+                model.addAttribute("errorMessage", "Error fetching doctor data: " + e.getMessage());
+            }
+        }
+
+	    catch (HttpServerErrorException e) {
+	            e.printStackTrace();
+	            model.addAttribute("errorMessage", "Server error: " + e.getMessage());
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            model.addAttribute("errorMessage", "Error fetching appointments: " + e.getMessage());
+	        }
+
+        // Return the view name that will display the report
+        return "lowConsultationDoctorsReport";
+    }
+
     
 
 }

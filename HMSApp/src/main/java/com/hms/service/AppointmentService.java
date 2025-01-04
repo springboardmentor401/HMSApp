@@ -2,7 +2,10 @@ package com.hms.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,8 +119,10 @@ public class AppointmentService {
         List<Appointment> allAppointments = appointmentRepository.findAll();
         return allAppointments.stream()
                 .filter(appointment -> appointment.getAppointmentDate().equals(date))
+                .filter(appointment -> "SCHEDULED".equalsIgnoreCase(appointment.getStatus())) // Filter for scheduled appointments
                 .collect(Collectors.toList());
     }
+
     public void updateAppointmentDetails(int appointmentId, String doctorReport, String medicinesSuggested) throws InvalidEntityException {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new InvalidEntityException("Appointment not found for ID: " + appointmentId));
@@ -134,6 +139,50 @@ public class AppointmentService {
         // Save updated appointment
         appointmentRepository.save(appointment);
     }
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll(); // Fetches all appointments
+    }
+    public List<Doctor> getDoctorsWithLowConsultationFee(LocalDate start, LocalDate end) {
+        // Ensure the dates are valid
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Start date cannot be after end date.");
+        }
+        if (start.isBefore(LocalDate.now()) || end.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Dates cannot be in the past. Only present and future dates are allowed.");
+        }
+
+        // Fetch all appointments within the given date range
+        List<Appointment> appointments = appointmentRepository.findAppointmentsByDateRange(start, end);
+
+        if (appointments.isEmpty()) {
+            return new ArrayList<>(); // Return an empty list if no appointments are found
+        }
+
+        // Logic to calculate the total consultation fees per doctor
+        Map<Integer, Double> doctorConsultationFees = new HashMap<>();
+        for (Appointment appointment : appointments) {
+            int doctorId = appointment.getDoctorObj().getDoctorId();
+            double consultationFee = appointment.getDoctorObj().getConsultationFees();
+            doctorConsultationFees.put(doctorId, doctorConsultationFees.getOrDefault(doctorId, 0.0) + consultationFee);
+        }
+
+        // Find the doctor(s) with the lowest consultation fees
+        double minFee = doctorConsultationFees.values().stream()
+                                               .min(Double::compare)
+                                               .orElse(Double.MAX_VALUE);
+
+        // Find doctor IDs with the minimum fee
+        List<Integer> doctorIds = doctorConsultationFees.entrySet().stream()
+            .filter(entry -> entry.getValue() == minFee)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+
+        // Fetch doctors in a single database call
+        List<Doctor> lowFeeDoctors = doctorRepository.findAllById(doctorIds);
+
+        return lowFeeDoctors;
+    }
+
     
     
     
