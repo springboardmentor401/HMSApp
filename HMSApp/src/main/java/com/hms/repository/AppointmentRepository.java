@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.hms.entities.Appointment;
+import com.hms.entities.Doctor;
 import com.hms.entities.Patient;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
@@ -28,5 +29,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
 	    List<Patient> findPatientsWithPastScheduledAppointments();
 	 @Query("SELECT a FROM Appointment a WHERE a.appointmentDate BETWEEN :startDate AND :endDate")
 	    public List<Appointment> findAppointmentsByDateRange(LocalDate startDate, LocalDate endDate);
-
+	 List<Appointment> findByDoctorObjAndAppointmentDateBetween(Doctor doctorObj, LocalDate startDate, LocalDate endDate);
 }
