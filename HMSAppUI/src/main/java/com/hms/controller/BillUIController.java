@@ -1,5 +1,6 @@
 package com.hms.controller;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,7 +92,7 @@ public class BillUIController{
         return "Patient";
     }*/
     
-    @GetMapping("/patient/pending")
+    @GetMapping("/patient/pendingg")
     public String getPendingBills(Model model) {
         // Use `patientId` from session if available
         Integer patientId = 0;
@@ -117,6 +118,11 @@ public class BillUIController{
         System.out.println(url);
         Bill[] billsArray = restTemplate.getForObject(url, Bill[].class);
         List<Bill> pendingBills = Arrays.asList(billsArray);
+        DecimalFormat df = new DecimalFormat("0.00");
+        for (Bill bill : pendingBills) {
+            bill.setTotalAmount(Double.parseDouble(df.format(bill.getTotalAmount())));
+            bill.setTotalPaid(Double.parseDouble(df.format(bill.getTotalPaid())));
+        }
 
         // Add bills to the model
         model.addAttribute("patientId", patientId);

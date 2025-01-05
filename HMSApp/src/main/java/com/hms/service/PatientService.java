@@ -138,17 +138,24 @@ public class PatientService {
     }
 
     public void deactivateInactivePatients() {
-        List<Patient> patients = patientRepository.findAllWithAppointments(); // Fetch patients with their appointments
+        List<Patient> patients = patientRepository.findAllWithAppointments();
+        
+        // Send the email to the patient
+       // Fetch patients with their appointments
 
         LocalDate twoYearsAgo = LocalDate.now().minusYears(2);  // Date 2 years ago from today
 
         for (Patient patient : patients) {
-            String isInactive = "INACTIVE";  // Default value is "INACTIVE"
+            String isInactive = "INACTIVE";
+            
+            // Default value is "INACTIVE"
 
             if (patient.getAppointmentList() != null && !patient.getAppointmentList().isEmpty()) {
                 // Check if the patient has any appointment within the last 2 years
                 boolean hasRecentAppointment = patient.getAppointmentList().stream()
                         .anyMatch(appointment -> appointment.getAppointmentDate().isAfter(twoYearsAgo));
+                
+
                 
                 // If there's any recent appointment, set status to "ACTIVE"
                 if (hasRecentAppointment) {
@@ -157,7 +164,20 @@ public class PatientService {
             }
 
             // Set the patient's status based on the "isInactive" value
-            patient.setStatus(isInactive);  // Set status as a String ("ACTIVE" or "INACTIVE")
+            patient.setStatus(isInactive); // Set status as a String ("ACTIVE" or "INACTIVE")
+            if(patient.getStatus().equals("INACTIVE"))
+            {
+            	String subject = "Patient Information deactivated " + patient.getPatientName();
+                String text = "Dear " + patient.getPatientName() + ",\n\n" +
+                              "We would like to inform you that your records has been deactivated .\n\n" +
+                              "As you didn't book any appointment for the past two year \n" +
+                              
+                             
+                              "Best regards,\n" +
+                              "The Care and Cure Hospital Team\n" +
+                              "----------------------------------------------\n" ;
+                emailService.sendEmail(patient.getEmailId(), subject, text);
+            }
         }
 
         // Save updated patients back to the database
@@ -165,7 +185,7 @@ public class PatientService {
     }
 
     // Scheduled task that runs every day at midnight (you can adjust the cron expression as needed)
-    @Scheduled(cron = "0 0 0 * * ?")  // Runs daily at midnight
+    @Scheduled(cron = "0 10 22 * * ?")  // Runs daily at midnight
     public void scheduledDeactivation() {
         deactivateInactivePatients();  // Call the deactivateInactivePatients method to check and update patient status
     }

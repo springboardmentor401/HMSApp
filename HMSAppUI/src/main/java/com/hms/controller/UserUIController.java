@@ -120,14 +120,15 @@ public class UserUIController {
     }
     
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session ,Model model) {
     	session.setAttribute("patObj", null);
         
     	session.setAttribute("docObj", null);
     	session.setAttribute("role", "");
     	
         session.invalidate();
-    	return "logout"; // Create a Thymeleaf template `logout.html` for this
+        model.addAttribute("userInfo", new UserInfo());
+    	return "login"; // Create a Thymeleaf template `logout.html` for this
     }
     
     @GetMapping("/admin")

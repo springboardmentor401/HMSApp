@@ -90,6 +90,7 @@
     <table>
         <thead>
             <tr>
+				<th>Doctor Id</th>
                 <th>Name</th>
                 <th>Specialization</th>
                 <th>Contact Number</th>
@@ -104,6 +105,7 @@
         </thead>
         <tbody>
             <tr th:each="doctor : ${doctors}">
+				<td th:text="${doctor.doctorId}"></td>
                 <td th:text="${doctor.doctorName}"></td>
                 <td th:text="${doctor.specialization}"></td>
                 <td th:text="${doctor.contactNumber}"></td>

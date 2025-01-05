@@ -36,9 +36,11 @@ public class Doctor {
     @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Specialization must contain only alphabets and spaces")
     @Column
     private String specialization;
+   
+  
 
     @NotBlank(message = "Qualification cannot be blank")
-    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Qualification must contain only alphabets and spaces")
+    @Pattern(regexp = "^[a-zA-Z\\s.,]+$", message = "Qualification must contain only alphabets, spaces, dot, and commas")
     @Column
     private String qualification;
 

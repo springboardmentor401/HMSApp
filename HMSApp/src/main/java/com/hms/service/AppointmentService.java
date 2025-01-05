@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.hms.entities.Appointment;
@@ -29,6 +30,9 @@ public class AppointmentService {
 
     @Autowired
     private PatientRepository patientRepository;
+    
+    @Autowired
+    private EmailService emailService;
 
     public Appointment saveAppointment(Appointment appointment,int doctorId,int patientId) throws InvalidEntityException {
         Doctor doctor = doctorRepository.findById(doctorId)
@@ -128,12 +132,14 @@ public class AppointmentService {
                 .orElseThrow(() -> new InvalidEntityException("Appointment not found for ID: " + appointmentId));
 
         // Check if the appointment status is "Scheduled"
-        if (!"Scheduled".equalsIgnoreCase(appointment.getStatus())) {
+        if ("Cancelled".equalsIgnoreCase(appointment.getStatus())) {
             throw new InvalidEntityException("Cannot update an appointment with status: " + appointment.getStatus());
         }
+        
 
         // Update only the specified fields
         appointment.setDoctorReport(doctorReport);
+        appointment.setStatus("Completed");
         appointment.setMedicineSuggested(medicinesSuggested);
 
         // Save updated appointment
@@ -191,6 +197,27 @@ public class AppointmentService {
 
         // Fetch appointments using the repository method
         return appointmentRepository.findByDoctorObjAndAppointmentDateBetween(doctor, startDate, endDate);
+    }
+    @Scheduled(cron = "0 0 8 * * ?") // Runs every day at 8 AM
+    public void sendNotificationOneDayBefore() {
+    	
+    	LocalDate notificationDate = LocalDate.now().plusDays(1);
+
+        // Get appointments for the notification date
+        List<Appointment> appointments = getAppointmentsForDate(notificationDate);
+// Send email notifications to patients
+        for (Appointment appointment : appointments) {
+            Patient patient = appointment.getPatientObj(); // Assuming this method exists
+            String email = patient.getEmailId(); // Assuming getEmailID() method exists
+            String message = generateEmailMessage(appointment);
+            emailService.sendEmail(email, "Appointment Reminder", message);
+        }
+    }
+private String generateEmailMessage(Appointment appointment) {
+        return String.format("Dear %s, this is a reminder for your appointment scheduled on %s at %s.",
+                appointment.getPatientObj().getPatientName(),
+                appointment.getAppointmentDate(),
+                appointment.getStartTime()); // Assuming getAppointmentTime() exists
     }
 
     
