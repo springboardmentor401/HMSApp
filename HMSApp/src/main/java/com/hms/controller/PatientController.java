@@ -84,7 +84,6 @@ public class PatientController {
     public ResponseEntity<?> getPatientByName(@PathVariable("name") String name) {
         List<Patient> patients = service.getPatientByName(name.trim());  // Trim to remove leading/trailing spaces
 
-        // Log the list of patients for debugging
         System.out.println("Found patients: " + patients);
 
         if (patients.isEmpty()) {
@@ -97,7 +96,6 @@ public class PatientController {
     public ResponseEntity<?> getPatientByMedicalHistory(@PathVariable("history") String medicalHistory) {
         List<Patient> patients = service.getPatientsByMedicalHistory(medicalHistory.trim());  // Trim to remove leading/trailing spaces
 
-        // Log the list of patients for debugging
         System.out.println("Found patients with medical history: " + medicalHistory);
 
         if (patients.isEmpty()) {
@@ -113,22 +111,18 @@ public class PatientController {
    
     @PutMapping("/updatePatient/{id}")
     public ResponseEntity<?> updatePatient(@PathVariable("id") int id, @RequestBody Patient updatedPatient) {
-        // Handle validation errors
     	
        
-            // Fetch the existing patient by ID
             Patient existingPatient = service.getPatientById(id);
             
             if (existingPatient == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found."); // Patient not found
             }
 
-            // Ensure the ID is preserved in the updated patient object
             updatedPatient.setPatientId(id); 
             updatedPatient.setUser(existingPatient.getUser());
             updatedPatient.setDateOfBirth(existingPatient.getDateOfBirth());
             updatedPatient.setStatus(existingPatient.getStatus());
-            // Call service to update the patient in the database
             Patient savedPatient = service.updatePatient(updatedPatient);
 
             return ResponseEntity.ok(savedPatient); // Return the updated patient in the response

@@ -113,7 +113,6 @@ public class PatientUIController {
             model.addAttribute("userInfo", new UserInfo());
             return "login";
         } catch (HttpClientErrorException e) {
-            // Parse and display validation errors from backend
             Map<String, String> errors=null;;
 					try {
 						errors = new ObjectMapper().readValue(
@@ -240,31 +239,56 @@ public class PatientUIController {
     }
 
     @PostMapping("/updatePatients")
-    public String updatePatient(@ModelAttribute("patient") Patient patient, BindingResult result, Model model) {
+    public String updatePatient(
+            @ModelAttribute("patient") Patient patient,
+            BindingResult result,
+            Model model,
+            @SessionAttribute(name = "role", required = false) String role) {
         try {
-        	HttpHeaders headers = new HttpHeaders();
+            // Check for validation errors before proceeding
+            if (result.hasErrors()) {
+                model.addAttribute("error", "Please correct the highlighted errors.");
+                return "updatePatient"; // Return to the update form with errors
+            }
+
+            HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Patient> request = new HttpEntity<>(patient, headers);
 
-            // Ensure the URL is correctly formed with patientId as a path variable
             ResponseEntity<Patient> response = restTemplate.exchange(
-                BASE_URL + "/api/patient/updatePatient/" + patient.getPatientId(), // Correct path variable used here
+                BASE_URL + "/api/patient/updatePatient/" + patient.getPatientId(),
                 HttpMethod.PUT,
                 request,
                 Patient.class
             );
 
+            // Check if the response body is null
+            if (response.getBody() == null) {
+                model.addAttribute("error", "Unexpected response from the server.");
+                return "updatePatient";
+            }
+
             model.addAttribute("message", "Patient updated successfully: " + response.getBody().getPatientName());
-            return "/patient/patientinfo";
+            if ("admin".equalsIgnoreCase(role)) {
+                return "redirect:/admin/patientinfo";
+            } else {
+                return "redirect:/patient/patientinfo";
+            }
+
         } catch (HttpClientErrorException e) {
             Map<String, String> errors = parseBackendErrors(e);
             if (errors != null) {
                 errors.forEach((field, errorMsg) -> result.rejectValue(field, "", errorMsg));
             }
             model.addAttribute("error", "Failed to update patient. Please correct the errors.");
+            return "updatePatient"; // Return to the update form with errors
+        } catch (Exception e) {
+            model.addAttribute("error", "An unexpected error occurred: " + e.getMessage());
             return "updatePatient";
         }
     }
+
+
 
     @GetMapping("/viewPatientByMedicalHistoryForm")
     public String viewPatientByMedicalHistoryForm() {

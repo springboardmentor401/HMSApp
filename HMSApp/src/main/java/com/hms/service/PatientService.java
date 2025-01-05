@@ -102,12 +102,25 @@ public class PatientService {
     
 
     public Patient updatePatient(Patient patient) {
+        // Save the updated patient details in the database
         Patient updatedPatient = patientRepository.save(patient);
-       
-        String subject = "Patient Updated: " + patient.getPatientName();
-        String text = "Dear Team,\n\nThe details of the patient have been updated.\n\nPatient Name: " + patient.getPatientName() +
-                      "\n\nPlease review the updated patient information in the system.";
+
+        // Prepare the email content
+        String subject = "Patient Information Updated: " + patient.getPatientName();
+        String text = "Dear " + patient.getPatientName() + ",\n\n" +
+                      "We would like to inform you that your details have been successfully updated in our system.\n\n" +
+                      "Here are the updated details:\n" +
+                      
+                      "Please review your updated information in the system at your earliest convenience.\n" +
+                      "If any of the details are incorrect, please reach out to us immediately.\n\n" +
+                      "Thank you for keeping your details up to date.\n\n" +
+                      "Best regards,\n" +
+                      "The Care and Cure Hospital Team\n" +
+                      "----------------------------------------------\n" ;
+
+        // Send the email to the patient
         emailService.sendEmail(patient.getEmailId(), subject, text);
+
         return updatedPatient;
     }
    

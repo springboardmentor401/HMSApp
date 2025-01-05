@@ -82,5 +82,41 @@ public class AppointmentController {
         	throw new InvalidEntityException("No appointments for today");
         return patients;
     }
+    @PutMapping("/update/{appointmentId}")
+    public ResponseEntity<String> updateAppointment(@PathVariable("appointmentId") int appointmentId, @RequestBody Appointment appointment)throws InvalidEntityException {
+        try {
+        	appointmentService.updateAppointmentDetails(appointmentId, appointment.getDoctorReport(), appointment.getMedicineSuggested());
+            return ResponseEntity.ok("Appointment updated successfully.");
+        } catch (InvalidEntityException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    @GetMapping("/all")
+    public List<Appointment> getAllAppointments() {
+        return appointmentService.getAllAppointments(); // Fetches all appointments
+    }
+    @GetMapping("/lowConsultationDoctors")
+    public ResponseEntity<List<Doctor>> getLowConsultationDoctors(@RequestParam("startDate") String startDate,
+                                                                   @RequestParam("endDate") String endDate) {
+        try {
+            // Convert the string dates to LocalDate
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+
+            // Fetch the low consultation doctors from the service
+            List<Doctor> lowFeeDoctors = appointmentService.getDoctorsWithLowConsultationFee(start, end);
+
+            // If no doctors found, return an empty list
+            if (lowFeeDoctors.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content if no doctors found
+            }
+
+            // Return the list of doctors as JSON with OK status
+            return new ResponseEntity<>(lowFeeDoctors, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            // Return the error message if the dates are invalid
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Return 400 BAD_REQUEST if there's an issue with input
+        }
+    }
 
 }

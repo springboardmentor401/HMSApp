@@ -26,4 +26,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
 	 @Query("SELECT a.patientObj FROM Appointment a WHERE a.appointmentDate < CURRENT_DATE " +
 	           "AND a.status = 'Scheduled'")
 	    List<Patient> findPatientsWithPastScheduledAppointments();
+	 @Query("SELECT a FROM Appointment a WHERE a.appointmentDate BETWEEN :startDate AND :endDate")
+	    public List<Appointment> findAppointmentsByDateRange(LocalDate startDate, LocalDate endDate);
+
 }

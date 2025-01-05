@@ -94,17 +94,15 @@ public class BillUIController{
     @GetMapping("/patient/pending")
     public String getPendingBills(Model model) {
         // Use `patientId` from session if available
-       // Integer patientId = (patSession != null) ? patSession.getPatientId() : null;
-    	Integer patientId=0;
-    	if(role!=null && role.equals("patient") && patSession!=null) {
-    		patientId = patSession.getPatientId();
-    	}
-    	else if(role.equals("patient") && patientId==null && patSession==null) 
-        {
-        	model.addAttribute("userInfo", new UserInfo());
+        Integer patientId = 0;
+
+        if (role != null && role.equals("patient") && patSession != null) {
+            patientId = patSession.getPatientId();
+        } else if (role != null && role.equals("patient") && patientId == null && patSession == null) {
+            model.addAttribute("userInfo", new UserInfo());
             return "login";
         }
-    	
+
         System.out.println("jwalkdjwkajdcriu hiu hrfwi e.k");
         System.out.println(patientId);
 

@@ -2,51 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Patients with Appointments Today</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .error-message {
-            color: red;
-            font-weight: bold;
-            margin-top: 10px;
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
             text-align: center;
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+        table {
+            background-color: white;
+        }
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-<h1>Patients with Appointments Today</h1>
-
-<!-- Error Message -->
-<div th:if="${errorMessage != null}">
-<p th:text="${errorMessage}" class="error-message"></p>
+<div class="container">
+    <h1>Patients with Appointments Today</h1>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Patient Name</th>
+                    <th>Appointment Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="patient : ${patients}">
+                    <td th:text="${patient.patientId}"></td>
+                    <td th:text="${patient.patientName}"></td>
+                    <!-- Assuming you are fetching the first appointment from the list of appointments -->
+                    <td th:text="${patient.appointmentList[0].startTime}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+	<a th:href = "@{/viewAllAppointments}">View all appointments</a><br><br>
+	<a href="/admin/appointmentinfo" class="btn btn-secondary mt-3">Back to Home</a>
 </div>
-<!-- Table Content -->
-<div th:if="${errorMessage == null}">
-<div th:if="${patients != null && patients.size() > 0}">
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Patient ID</th>
-                <th>Patient Name</th>
-		<th>Gender</th>
-		<th>Location</th>
-                <th>Email ID</th>
-                <th>Contact Number</th>
-            </tr>
-        </thead>
-        <tbody>
-			
-            <tr th:each="patient : ${patients}">
-		<td th:text="${patient.patientId}"></td>
-                <td th:text="${patient.patientName}"></td>
-                <td th:text="${patient.gender}"></td>
-		<td th:text="${patient.location}"></td>
-		<td th:text="${patient.emailId}"></td>
-		<td th:text="${patient.contactNumber}"></td>
-								
-            </tr>
-        </tbody>
-    </table>
-</div>
-</div>
-<a href="/admin/appointmentinfo" class="btn btn-secondary mt-3">Back to Home</a>
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

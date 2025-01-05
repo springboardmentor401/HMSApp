@@ -22,7 +22,10 @@
         <!-- Update Bill Form -->
 		<form action="/updateBill" method="post">
 		    <input type="hidden" name="billId" th:value="${bill.billId}" />
-
+			<div class="form-group">
+							        <label for="medicineFees">BillID</label>
+							        <input type="number" name="medicineFees" class="form-control" th:value="${bill.billId}"  readonly required />
+							    </div>
 		    <div class="form-group">
 		        <label for="description">Description</label>
 		        <input 
@@ -30,7 +33,7 @@
 		            name="description" 
 		            class="form-control" 
 		            th:value="${bill.description}" 
-		            readonly 
+		           
 		            style="background-color: #f8f9fa; cursor: not-allowed;" 
 		        />
 		    </div>
@@ -45,10 +48,7 @@
 		        <input type="number" name="medicineFees" class="form-control" th:value="${bill.medicineFees}" required />
 		    </div>
 			
-			<div class="form-group">
-				        <label for="medicineFees">BillID</label>
-				        <input type="number" name="medicineFees" class="form-control" th:value="${bill.billId}" required />
-				    </div>
+			
 
 		    <div class="form-group">
 		        <label for="testCharge">Test Charge</label>

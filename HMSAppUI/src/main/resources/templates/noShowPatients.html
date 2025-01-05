@@ -1,17 +1,97 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>No-Show Patients Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: red;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            max-width: 100%;
+            overflow-x: auto;
+            margin: 20px auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-data-message {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .back-button {
+            display: inline-block;
+            text-decoration: none;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>No-Show Patients</h1>
 
     <!-- Display error message if any -->
-    <p th:if="${error != null}" th:text="${error}" style="color: red;"></p>
+    <p th:if="${error != null}" th:text="${error}" class="error-message"></p>
 
     <!-- Check if the noShowPatients list has data -->
-    <div th:if="${noShowPatients != null}">
-        <table border="1">
+    <div class="table-container" th:if="${noShowPatients != null}">
+        <table>
             <thead>
                 <tr>
                     <th>Patient ID</th>
@@ -51,7 +131,11 @@
     </div>
 
     <!-- Display a message if no data is found -->
-    <p th:if="${noShowPatients == null || noShowPatients.isEmpty()}">No data to display.</p>
-	<a href="/admin/patientinfo" class="btn btn-secondary mt-3">Back to Home</a>
+    <p class="no-data-message" th:if="${noShowPatients == null || noShowPatients.isEmpty()}">No data to display.</p>
+
+    <!-- Back to Home Button -->
+    <div style="text-align: center;">
+        <a href="/admin/patientinfo" class="back-button">Back to Home</a>
+    </div>
 </body>
 </html>

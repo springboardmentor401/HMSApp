@@ -71,6 +71,10 @@ public class PaymentController {
     private PaymentRepository paymentRepository;
 
     // Backend logic for calculating doctor revenue (this could be called via AJAX or a normal GET request)
+    @GetMapping("/revenue-by-doc/{fromDate}/{toDate}/")
+    public Map<String, Double> getDoctorRevenue(@PathVariable LocalDate fromDate, @PathVariable LocalDate toDate) {
+    	return service.getDoctorRevenue(fromDate, toDate);
+    }
     @GetMapping("/revenue-breakdown")
     @ResponseBody
     public Map<String, Object> calculateDoctorRevenueWithBreakdown(@RequestParam("doctorId") Integer doctorId) {

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final BillRepository billRepo;
     private final EmailService emailService;
+    
 
     @Autowired
     public PaymentService(PaymentRepository paymentRepository, BillRepository billRepo, EmailService emailService) {
@@ -36,6 +38,14 @@ public class PaymentService {
         return paymentRepository.findByBillObj_Appointment_PatientObj_PatientId(patientId);
     }
     
+    public Map<String, Double> getDoctorRevenue(LocalDate fromDate, LocalDate toDate) {
+        List<Object[]> results = paymentRepository.findDoctorRevenue(fromDate, toDate);
+        return results.stream()
+                      .collect(Collectors.toMap(
+                          result -> (String) result[0], // Doctor name
+                          result -> (Double) result[1]  // Total revenue
+                      ));
+    }
 
     @Transactional
     public Payment addPayment(Payment payment, int billId) throws InvalidEntityException {
