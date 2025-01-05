@@ -43,7 +43,7 @@ public class Doctor {
     private String qualification;
 
     @NotBlank(message = "Contact number cannot be blank")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Contact number must be a valid 10-digit number")
+    @Pattern(regexp = "^[6-9][0-9]{9}$", message = "Contact number must start with 6, 7, 8, or 9 and be a 10-digit number")
     @Column
     private String contactNumber;
 

@@ -1,139 +1,77 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pending Bills</title>
+    <title>Paid Bills</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-        /* Inline CSS for improved UI */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
+        .container {
+            margin-top: 30px;
+            max-width: 80%;
         }
-
-        h1 {
+        .error-message {
+            color: red;
+            font-weight: bold;
             text-align: center;
-            color: #333;
-            margin-top: 2rem;
-            font-size: 2rem;
         }
-
-        table {
-            width: 80%;
-            margin: 2rem auto;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        th, td {
-            padding: 1rem;
+        .no-data-message {
             text-align: center;
-            border: 1px solid #ddd;
+            font-size: 18px;
+            color: #555;
         }
-
-        th {
-            background-color: #0047ab;
-            color: white;
-            font-weight: bold;
+        .table-container {
+            margin-top: 30px;
         }
-
-        td {
-            background-color: #f9f9f9;
+        .search-container {
+            margin-bottom: 20px;
         }
-
-        td a {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        td a:hover {
-            background-color: #218838;
-        }
-
-        td a:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        /* Media Query for smaller screens */
-        @media (max-width: 768px) {
-            table {
-                width: 100%; /* Full width on smaller screens */
-                margin: 1rem;
-            }
-
-            th, td {
-                padding: 0.8rem;
-            }
-        }
-
-        /* Styling for the 'View Past Bill History' link at the top-right */
-        .view-history {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .view-history a {
-            background-color: #007bff;
-            padding: 0.5rem 1rem;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-
-        .view-history a:hover {
-            background-color: #0056b3;
-        }
-
     </style>
 </head>
 <body>
-    <div class="view-history">
-		<a th:href="@{/paidbills/{patientId}(patientId=${patientId})}">Paid Bills</a>
+    <div class="container">
+        <h1 class="text-center">Paid Bills</h1>
 
+        <!-- Date range form -->
+        <div class="search-container">
+            <form action="/paid" method="get" class="d-flex justify-content-end">
+                <input type="date" id="startDate" name="startDate" class="form-control me-2" th:value="${startDate}">
+                <input type="date" id="endDate" name="endDate" class="form-control me-2" th:value="${endDate}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <!-- Error or No Data Message -->
+        <div th:if="${error}" class="error-message">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Paid Bills Table -->
+        <div th:if="${paidBills != null && !paidBills.isEmpty()}">
+            <table class="table table-striped table-bordered table-hover table-container">
+                <thead>
+                    <tr>
+                        <th>Patient ID</th>
+                        <th>Patient Name</th>
+                        <th>Bill ID</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bill : ${paidBills}">
+                        <td th:text="${bill.appointment.patientObj.patientId}"></td>
+                        <td th:text="${bill.appointment.patientObj.patientName}"></td>
+                        <td th:text="${bill.billId}"></td>
+                        <td th:text="${bill.totalAmount}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- No Bills Found Message -->
+        <div th:if="${paidBills != null && paidBills.isEmpty()}" class="no-data-message">
+            <p>No bills found for the given date range.</p>
+        </div>
     </div>
-
-    <h1>Pending Bills</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Bill ID</th>
-                <th>Total Amount</th>
-                <th>Total Paid</th>
-                <th>Outstanding Amount</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="bill : ${pendingBills}">
-                <td th:text="${bill.billId}"></td>
-                <td th:text="${bill.totalAmount}"></td>
-                <td th:text="${bill.totalPaid}"></td>
-                <td th:text="${bill.totalAmount - bill.totalPaid}"></td>
-                
-					<td>
-					    <a th:href="@{/make-payment(billId=${bill.billId}, totalAmount=${bill.totalAmount}, totalPaid=${bill.totalPaid}, outstandingAmount=${bill.totalAmount - bill.totalPaid})}" 
-					       th:if="${bill.totalAmount - bill.totalPaid > 0}">
-					        Make Payment
-					    </a>
-					</td>
-
-               
-            </tr>
-        </tbody>
-    </table>
- <!-- Go Back Button -->
-
- <a href="/patient/billinfo" >Back to Home</a>
 </body>
 </html>

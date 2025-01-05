@@ -43,7 +43,7 @@ public class AppointmentService {
         appointment.setReasonForVisit(appointment.getReasonForVisit());
 
         appointment.calculateEndTime();
-
+   
         // Check if there is any conflict with existing appointments
         if (hasAppointmentConflict(appointment)) {
             throw new InvalidEntityException("The doctor already has an appointment scheduled during the requested time.");

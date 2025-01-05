@@ -123,8 +123,8 @@ public class AppointmentController {
     public ResponseEntity<?> getAppointmentsForDoctor(
             @PathVariable int doctorId,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        try {
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws InvalidEntityException {
+        
             List<Appointment> appointments = appointmentService.getAppointmentsForDoctor(doctorId, startDate, endDate);
 
             // Return 204 No Content if no appointments found
@@ -133,20 +133,9 @@ public class AppointmentController {
             }
 
             return ResponseEntity.ok(appointments);
-        } catch (InvalidEntityException e) {
-            // Handle specific cases based on the exception message
-            if (e.getMessage().equals("End date cannot be before start date.")) {
-                return ResponseEntity.badRequest().body(e.getMessage());
-            } else {
-                // Return 404 Not Found for invalid doctor ID
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-            }
-        } catch (Exception e) {
-            // Return 500 Internal Server Error for unexpected exceptions
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred: " + e.getMessage());
-        }
-    }
+       
+    
 
 
+}
 }

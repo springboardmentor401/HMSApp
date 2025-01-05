@@ -277,8 +277,6 @@ public class BillUIController{
         return "paidBills"; // Template in resources/templates/paidBills.html
     }
 
-
-
     @GetMapping("/searchBill")
     public String searchBill(@RequestParam("billId") Long billId, Model model) {
         String url = BASE_URL + "/api/bills/viewBill/" + billId; // API call to fetch bill by ID

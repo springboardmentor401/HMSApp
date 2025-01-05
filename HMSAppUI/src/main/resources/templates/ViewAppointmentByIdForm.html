@@ -107,7 +107,7 @@
             </tr>
         </table>
 		<div class="back-link">
-		        <a th:href="@{/}">Back to Home</a>
+		        <a th:href="@{/admin/appointmentinfo}">Back to Home</a>
 		    </div>
     </div>
 
@@ -115,7 +115,9 @@
     <div th:if="${errorMessage}" class="error-message">
         <p th:text="${errorMessage}"></p>
 		<div class="back-link">
-				        <a th:href="@{/AppointmentHome}">Back to Home</a>
+			<div class="col-sm-4">
+								<a href="/admin/appointmentinfo" >Back to Home</a>
+						    </div>   
 				    </div>
     </div>
 

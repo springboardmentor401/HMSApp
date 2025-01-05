@@ -112,8 +112,9 @@ public class AppointmentController {
     		
     	RestTemplate restTemplate = new RestTemplate();
             String appointmentUrl = BASE_URL + "/api/appointments/bookAppointment/"+doctorId+"/"+patientId;
-            ResponseEntity<String> response = restTemplate.postForEntity(appointmentUrl, appointment, String.class);
-            model.addAttribute("message", "Appointment has been successfully scheduled");
+            ResponseEntity<Appointment> response = restTemplate.postForEntity(appointmentUrl, appointment, Appointment.class);
+            Appointment appObj= response.getBody();
+            model.addAttribute("message", "Appointment has been successfully scheduled and  your appointment id is "+ appObj.getAppointmentId() );
             List<Doctor> doctors = getDocList();
             model.addAttribute("doctors", doctors);
             
@@ -544,12 +545,21 @@ public class AppointmentController {
             model.addAttribute("errorMessage", "Doctor ID not found. Enter a valid ID.");
             return "viewDoctorAppointmentsForm"; // Return the same page
         }
-        catch (HttpClientErrorException.BadRequest e) {
-            // Assuming the backend sends a 400 Bad Request for invalid start date
-        	 String errorMessage = e.getResponseBodyAsString();
-        	if (errorMessage.contains("End date cannot be before start date")) {
-                model.addAttribute("errorMessage", "End date cannot be before start date. Please select valid dates.");
-            }
+        catch (HttpClientErrorException | HttpServerErrorException e) {
+            // Handle 404 error specifically
+        	Map<String, String> errors=null;;
+			try {
+				errors = new ObjectMapper().readValue(
+				    e.getResponseBodyAsString(), new TypeReference<Map<String, String>>() {});
+			
+				// Map backend error message to Model
+				model.addAttribute("errorMessage", errors.get("message")); //mapname.get(key) ->value
+			} catch (JsonProcessingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        
+       
         } 
         catch (Exception e) {
             e.printStackTrace();
