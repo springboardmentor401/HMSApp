@@ -514,6 +514,50 @@ public class AppointmentController {
         // Return the view name that will display the report
         return "lowConsultationDoctorsReport";
     }
+    
+    @GetMapping("/viewDoctorAppointmentsForm")
+    public String viewDoctorAppointmentsForm(Model model) {
+        // Add a new map to hold the form inputs if needed
+        model.addAttribute("searchCriteria", new HashMap<String, String>());
+        return "viewDoctorAppointmentsForm"; // This corresponds to the form view
+    }
+    @PostMapping("/viewDoctorAppointments")
+    public String viewDoctorAppointments(@RequestParam("doctorId") int doctorId,
+                                          @RequestParam("startDate") String startDate,
+                                          @RequestParam("endDate") String endDate,
+                                          Model model) {
+        try {
+            String backendUrl = BASE_URL + "/api/appointments/doctor/" + doctorId +
+                                "?startDate=" + startDate + "&endDate=" + endDate;
+
+            ResponseEntity<List<Appointment>> response = restTemplate.exchange(
+                    backendUrl,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Appointment>>() {}
+            );
+
+            List<Appointment> appointments = response.getBody();
+            model.addAttribute("appointments", appointments);
+        } 
+        catch (HttpClientErrorException.NotFound e) {
+            model.addAttribute("errorMessage", "Doctor ID not found. Enter a valid ID.");
+            return "viewDoctorAppointmentsForm"; // Return the same page
+        }
+        catch (HttpClientErrorException.BadRequest e) {
+            // Assuming the backend sends a 400 Bad Request for invalid start date
+        	 String errorMessage = e.getResponseBodyAsString();
+        	if (errorMessage.contains("End date cannot be before start date")) {
+                model.addAttribute("errorMessage", "End date cannot be before start date. Please select valid dates.");
+            }
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("errorMessage", "Error fetching appointments: " + e.getMessage());
+        }
+
+        return "viewDoctorAppointments"; // This corresponds to the result view
+    }
 
     
 

@@ -182,6 +182,16 @@ public class AppointmentService {
 
         return lowFeeDoctors;
     }
+    public List<Appointment> getAppointmentsForDoctor(int doctorId, LocalDate startDate, LocalDate endDate) throws InvalidEntityException {
+    	if (endDate.isBefore(startDate)) {
+            throw new InvalidEntityException("End date cannot be before start date.");
+        }
+        Doctor doctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new InvalidEntityException("Doctor not found"));
+
+        // Fetch appointments using the repository method
+        return appointmentRepository.findByDoctorObjAndAppointmentDateBetween(doctor, startDate, endDate);
+    }
 
     
     

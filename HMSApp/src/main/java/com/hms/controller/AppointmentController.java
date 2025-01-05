@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -118,5 +119,34 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Return 400 BAD_REQUEST if there's an issue with input
         }
     }
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<?> getAppointmentsForDoctor(
+            @PathVariable int doctorId,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            List<Appointment> appointments = appointmentService.getAppointmentsForDoctor(doctorId, startDate, endDate);
+
+            // Return 204 No Content if no appointments found
+            if (appointments.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+
+            return ResponseEntity.ok(appointments);
+        } catch (InvalidEntityException e) {
+            // Handle specific cases based on the exception message
+            if (e.getMessage().equals("End date cannot be before start date.")) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            } else {
+                // Return 404 Not Found for invalid doctor ID
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            }
+        } catch (Exception e) {
+            // Return 500 Internal Server Error for unexpected exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
 
 }
