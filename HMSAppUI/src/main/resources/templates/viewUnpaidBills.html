@@ -118,17 +118,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="bill : ${bills}">
-                        <td th:text="${bill.billId}"></td>
-                        <td th:text="${bill.patientName}"></td>
-                        <td th:text="${bill.totalAmount}"></td>
-                        <td th:text="${bill.billDate}"></td>
-                        <td th:text="${bill.totalPaid}"></td>
-                        <td th:text="${bill.remainingAmount}"></td>
-                        <td>
-                            <a th:href="@{/updateBill(billId=${bill.billId})}" class="btn btn-info">Update</a>
-                        </td>
-                    </tr>
+					<tr th:each="bill : ${bills}" th:if="${bill.remainingAmount >= 1}">
+					    <td th:text="${bill.billId}"></td>
+					    <td th:text="${bill.patientName}"></td>
+					    <td th:text="${#numbers.formatDecimal(bill.totalAmount, 0, 2)}"></td> <!-- Total Amount formatted to 2 decimals -->
+					    <td th:text="${bill.billDate}"></td>
+					    <td th:text="${#numbers.formatDecimal(bill.totalPaid, 0, 2)}"></td> <!-- Total Paid formatted to 2 decimals -->
+					    <td th:text="${#numbers.formatDecimal(bill.remainingAmount, 0, 2)}"></td> <!-- Remaining Amount formatted to 2 decimals -->
+					    <td>
+					        <a th:href="@{/updateBill(billId=${bill.billId})}" class="btn btn-info">Update</a>
+					    </td>
+					</tr>
+
                 </tbody>
             </table>
         </div>
