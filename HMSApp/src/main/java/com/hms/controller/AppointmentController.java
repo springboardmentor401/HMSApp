@@ -50,7 +50,9 @@ public class AppointmentController {
                                                @PathVariable("patientId") int patientId, 
                                                @Valid @RequestBody Appointment appointment) throws InvalidEntityException {
         
-        Appointment savedAppointment = appointmentService.saveAppointment(appointment, doctorId, patientId);
+       
+    	//Commented code
+    	Appointment savedAppointment = appointmentService.saveAppointment(appointment, doctorId, patientId);
             return new ResponseEntity<>(savedAppointment, HttpStatus.CREATED);
     }
     @PutMapping("/reschedule/{appointmentId}")
